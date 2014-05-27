@@ -1,5 +1,9 @@
-cmake-extras (0.1-0ubuntu1) UNRELEASED; urgency=low
+cmake-extras (0.1+14.10.20140527-0ubuntu1) utopic; urgency=low
 
+  [ Allan LeSage ]
   * Initial release.
+  * Initial commit.
+  * Added coverage macro files, added debian/copyright LGPL-3.
+  * Added debian/install for cmake macros.
 
- -- Allan LeSage <allan.lesage@canonical.com>  Tue, 27 May 2014 06:45:09 -0500
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 27 May 2014 14:34:20 +0000
