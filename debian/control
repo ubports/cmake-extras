@@ -1,0 +1,17 @@
+Source: cmake-extras
+Section: libs
+Priority: extra
+Maintainer: Ubuntu QA Team <qa-team@ubuntu.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+Homepage: https://launchpad.net/cmake-extras
+# if you don't have have commit access to this branch but would like to upload
+# directly to Ubuntu, don't worry: your changes will be merged back into the
+# upstream branch
+Vcs-Bzr: lp:cmake-extras
+
+Package: cmake-extras
+Architecture: all
+Depends: ${misc:Depends}
+Description: Extra CMake utility modules.
+ Includes coverage modules.
