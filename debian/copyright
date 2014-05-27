@@ -1,0 +1,18 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: cmake-extras
+Source: https://launchpad.net/cmake-extras
+
+Files: *
+Copyright: 2010 Johannes Wienke <jwienke@techfak.uni-bielefeld.de>
+License: LGPL-3
+ This file may be licensed under the terms of the
+ GNU Lesser General Public License Version 3 (the ``LGPL''),
+ or (at your option) any later version.
+ .
+ Software distributed under the License is distributed
+ on an ``AS IS'' basis, WITHOUT WARRANTY OF ANY KIND, either
+ express or implied. See the LGPL for the specific language
+ governing rights and limitations.
+ .
+ On Debian/Ubuntu systems, the full text of the LGPL v3 can be found in
+ `/usr/share/common-licenses/LGPL-3'
