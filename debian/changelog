@@ -1,3 +1,10 @@
+cmake-extras (0.2-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pete Woods ]
+  * Add XGettext translation macros.
+
+ -- Pete Woods <pete.woods@canonical.com>  Fri, 05 Sep 2014 13:10:37 +0100
+
 cmake-extras (0.1+14.10.20140527-0ubuntu1) utopic; urgency=low
 
   [ Allan LeSage ]
