@@ -12,45 +12,66 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Example usage:
+#
+#    include(UseXGettext)
+#
+#    add_translations_directory(${GETTEXT_PACKAGE})
+#
+#    add_translations_catalog(
+#        GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
+#        COPYRIGHT_HOLDER "Canonical Ltd."
+#        SOURCE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
+#    )
+
 cmake_minimum_required(VERSION 2.8.9)
 
 find_package(XGettext REQUIRED)
 
-macro(add_translations_directory NLS_PACKAGE)
+macro(add_translations_directory GETTEXT_PACKAGE)
     set(
-        POT_FILE
-        "${CMAKE_CURRENT_SOURCE_DIR}/${NLS_PACKAGE}.pot"
+        _POT_FILE
+        "${CMAKE_CURRENT_SOURCE_DIR}/${GETTEXT_PACKAGE}.pot"
     )
 
     file(
-	GLOB PO_FILES
+	GLOB _PO_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.po
     )
 
     gettext_create_translations(
-        ${POT_FILE}
+        ${_POT_FILE}
         ALL
-        ${PO_FILES}
+        ${_PO_FILES}
     )
 endmacro(add_translations_directory)
 
-macro(add_translations_catalog NLS_PACKAGE)
+macro(add_translations_catalog)
+    set(_oneValueArgs GETTEXT_PACKAGE COPYRIGHT_HOLDER)
+    set(_multiValueArgs SOURCE_DIRECTORIES)
+
+    cmake_parse_arguments(_ARG "" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
+
+    set(_GETTEXT_PACKAGE ${PROJECT})
+    if(_ARG_GETTEXT_PACKAGE)
+        set(_GETTEXT_PACKAGE ${_ARG_GETTEXT_PACKAGE})
+    endif()
+
     set(
-	POT_FILE
-	"${CMAKE_CURRENT_SOURCE_DIR}/${NLS_PACKAGE}.pot"
+	_POT_FILE
+	"${CMAKE_CURRENT_SOURCE_DIR}/${_GETTEXT_PACKAGE}.pot"
     )
 
-    add_custom_target (pot COMMENT “Building translation catalog.”
-        DEPENDS ${POT_FILE}
+    add_custom_target (pot
+        COMMENT “Building translation catalog.”
+        DEPENDS ${_POT_FILE}
     )
 
-    # init this list, which will hold all the sources across all dirs
-    set(SOURCES "")
+    set(_SOURCES "")
 
-    # add each directory's sources to the overall sources list
-    foreach(DIR ${ARGN})
+    foreach(DIR ${_ARG_SOURCE_DIRECTORIES})
         file(
-            GLOB_RECURSE DIR_SOURCES
+            GLOB_RECURSE _DIR_SOURCES
             RELATIVE ${CMAKE_SOURCE_DIR}
             ${DIR}/*.cpp
             ${DIR}/*.cc
@@ -59,18 +80,18 @@ macro(add_translations_catalog NLS_PACKAGE)
             ${DIR}/*.c
             ${DIR}/*.h
         )
-	set (SOURCES ${SOURCES} ${DIR_SOURCES})
+	set (_SOURCES ${_SOURCES} ${_DIR_SOURCES})
     endforeach()
 
     xgettext_create_pot_file(
-        ${POT_FILE}
+        ${_POT_FILE}
         CPP
         QT
-        INPUT ${SOURCES}
+        INPUT ${_SOURCES}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         ADD_COMMENTS "TRANSLATORS"
         KEYWORDS "_" "N_"
-        PACKAGE_NAME ${NLS_PACKAGE}
-        COPYRIGHT_HOLDER "Canonical Ltd."
+        PACKAGE_NAME ${_GETTEXT_PACKAGE}
+        COPYRIGHT_HOLDER ${_ARG_COPYRIGHT_HOLDER}
     )
 endmacro()
