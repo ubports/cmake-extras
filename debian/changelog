@@ -1,3 +1,10 @@
+cmake-extras (0.2+14.10.20140910-0ubuntu1) utopic; urgency=low
+
+  [ Pete Woods ]
+  * Support plural forms
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 10 Sep 2014 08:10:44 +0000
+
 cmake-extras (0.2+14.10.20140905-0ubuntu1) utopic; urgency=medium
 
   [ Pete Woods ]
