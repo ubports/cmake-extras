@@ -90,7 +90,7 @@ macro(add_translations_catalog)
         INPUT ${_SOURCES}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         ADD_COMMENTS "TRANSLATORS"
-        KEYWORDS "_" "N_"
+        KEYWORDS "_" "_:1,2" "N_" "N_:1,2"
         PACKAGE_NAME ${_GETTEXT_PACKAGE}
         COPYRIGHT_HOLDER ${_ARG_COPYRIGHT_HOLDER}
     )
