@@ -29,6 +29,8 @@
 #
 # intltool_update_potfile(
 #     ALL
+#     KEYWORDS "_" "_:1,2" "N_" "N_:1,2"
+#     POTFILES_TEMPLATE "POTFILES.in.in"
 #     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
 # )
 #
@@ -37,19 +39,10 @@
 #     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
 # )
 #
-# Remember to include a po/POTFILES.in file:
+# Either you must include a po/POTFILES.in file or use the POTFILES_TEMPLATE
+# argument and pass a file such as:
 # [type: gettext/ini] data/foo.ini.in
-# include/myfile.h
-# src/myfile.cpp
-#
-# This must enumerate every file that translations should be extracted
-# from.
-#
-# If your translations include plural forms, the default intltool keywords
-# assume you are using glib translation macros. If this is not the case,
-# you can override the extraction keywords by creating po/Makefile.in.in
-# with the following contents:
-# XGETTEXT_KEYWORDS=--c++ --keyword=_ --keyword=N_ --keyword=_:1,2
+# @GENERATED_POTFILES@
 
 find_package(Gettext REQUIRED)
 
@@ -99,11 +92,26 @@ find_package_handle_standard_args(
     HANDLE_COMPONENTS
 )
 
+function(JOIN_LIST LISTNAME GLUE OUTPUT)
+    set(_tmp "")
+    set(_first true)
+    foreach(VAL ${${LISTNAME}})
+        if(_first)
+            set(_tmp "${VAL}")
+            set(_first false)
+        else()
+            set(_tmp "${_tmp}${GLUE}${VAL}")
+        endif()
+    endforeach()
+    set(${OUTPUT} "${_tmp}" PARENT_SCOPE)
+endfunction()
+
 function(INTLTOOL_UPDATE_POTFILE)
     set(_options ALL)
-    set(_oneValueArgs GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY)
+    set(_oneValueArgs GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
+    set(_multiValueArgs KEYWORDS)
 
-    cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "" ${ARGN})
+    cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
     
     set(_POT_FILE "${PROJECT}.pot")
 
@@ -123,19 +131,53 @@ function(INTLTOOL_UPDATE_POTFILE)
     if(_ARG_PO_DIRECTORY)
         set(_PO_DIRECTORY "${_ARG_PO_DIRECTORY}")
     endif()
+
+    if(_ARG_KEYWORDS)
+        set(_KEYWORDS "XGETTEXT_KEYWORDS=--c++")
+        foreach(_KEYWORD ${_ARG_KEYWORDS})
+            set(_KEYWORDS "${_KEYWORDS} --keyword=${_KEYWORD}")
+        endforeach()
+        file(WRITE "${CMAKE_SOURCE_DIR}/po/Makefile.in.in" "${_KEYWORDS}\n")
+    endif()
+
+    if(_ARG_POTFILES_TEMPLATE)
+        file(
+            GLOB_RECURSE _SOURCE_FILES
+            RELATIVE ${CMAKE_SOURCE_DIR}
+            ${CMAKE_SOURCE_DIR}/*.cpp
+            ${CMAKE_SOURCE_DIR}/*.cc
+            ${CMAKE_SOURCE_DIR}/*.cxx
+            ${CMAKE_SOURCE_DIR}/*.vala
+            ${CMAKE_SOURCE_DIR}/*.c
+            ${CMAKE_SOURCE_DIR}/*.h
+            ${CMAKE_SOURCE_DIR}/*.qml
+            ${CMAKE_SOURCE_DIR}/*.js
+        )
+        join_list(_SOURCE_FILES "\n" GENERATED_POTFILES)
+        message("HELLO POTFILES ${GENERATED_POTFILES}")
+        configure_file(
+            ${_ARG_POTFILES_TEMPLATE}
+            "${CMAKE_SOURCE_DIR}/po/POTFILES.in"
+        )
+    endif()
     
+    # Read in the POTFILES
     file(
-        GLOB_RECURSE _CODE_SOURCES
-        ${CMAKE_SOURCE_DIR}/*.cpp
-        ${CMAKE_SOURCE_DIR}/*.cc
-        ${CMAKE_SOURCE_DIR}/*.cxx
-        ${CMAKE_SOURCE_DIR}/*.vala
-        ${CMAKE_SOURCE_DIR}/*.c
-        ${CMAKE_SOURCE_DIR}/*.h
-        ${CMAKE_SOURCE_DIR}/*.ini.in
-        ${CMAKE_SOURCE_DIR}/*.qml
-        ${CMAKE_SOURCE_DIR}/*.js
+        STRINGS
+        "${CMAKE_SOURCE_DIR}/po/POTFILES.in"
+         _POTFILES_LINES
     )
+
+    # Parse the input files from it
+    foreach(_LINE ${_POTFILES_LINES})
+        # Handle lines with types
+        string(FIND ${_LINE} "]" _POS)
+        if(_POS GREATER 0)
+            math(EXPR _POS "2+${_POS}")
+            string(SUBSTRING ${_LINE} ${_POS} -1 _LINE)
+        endif()
+        list(APPEND _CODE_SOURCES "${CMAKE_SOURCE_DIR}/${_LINE}")
+    endforeach()
 
     add_custom_command(
         OUTPUT "${_POT_FILE}"
