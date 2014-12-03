@@ -36,6 +36,15 @@
 #     ALL
 #     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
 # )
+#
+# Remember to include a po/POTFILES.in file:
+# [type: gettext/ini] data/foo.ini.in
+# include/myfile.h
+# src/myfile.cpp
+#
+# You can override the extraction keywords by creating po/Makefile.in.in
+# with the following contents:
+# XGETTEXT_KEYWORDS=--c++ --keyword=_ --keyword=N_ --keyword=_:1,2
 
 find_package(Gettext REQUIRED)
 
