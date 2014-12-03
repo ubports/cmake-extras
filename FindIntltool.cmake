@@ -27,12 +27,24 @@
 #
 # Inside po/CMakeLists.txt:
 #
+#
 # intltool_update_potfile(
 #     ALL
 #     KEYWORDS "_" "_:1,2" "N_" "N_:1,2"
 #     POTFILES_TEMPLATE "POTFILES.in.in"
 #     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
 # )
+#
+# or
+#
+# intltool_update_potfile(
+#     ALL
+#     UBUNTU_SDK_DEFAULTS
+#     POTFILES_TEMPLATE "POTFILES.in.in"
+#     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
+# )
+#
+# then
 #
 # intltool_install_translations(
 #     ALL
@@ -106,10 +118,18 @@ function(JOIN_LIST LISTNAME GLUE OUTPUT)
     set(${OUTPUT} "${_tmp}" PARENT_SCOPE)
 endfunction()
 
+macro(_WRITE_INTLTOOL_MAKEFILE_IN ARG_PO_DIRECTORY ARG_KEYWORDS)
+    set(_KEYWORDS "XGETTEXT_KEYWORDS=--c++")
+    foreach(_KEYWORD ${${ARG_KEYWORDS}})
+        set(_KEYWORDS "${_KEYWORDS} --keyword=${_KEYWORD}")
+    endforeach()
+    file(WRITE "${ARG_PO_DIRECTORY}/Makefile.in.in" "${_KEYWORDS}\n")
+endmacro()
+
 function(INTLTOOL_UPDATE_POTFILE)
-    set(_options ALL)
+    set(_options ALL UBUNTU_SDK_DEFAULTS)
     set(_oneValueArgs GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
-    set(_multiValueArgs KEYWORDS)
+    set(_multiValueArgs KEYWORDS FILE_EXTENSIONS)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
     
@@ -133,26 +153,37 @@ function(INTLTOOL_UPDATE_POTFILE)
     endif()
 
     if(_ARG_KEYWORDS)
-        set(_KEYWORDS "XGETTEXT_KEYWORDS=--c++")
-        foreach(_KEYWORD ${_ARG_KEYWORDS})
-            set(_KEYWORDS "${_KEYWORDS} --keyword=${_KEYWORD}")
-        endforeach()
-        file(WRITE "${_PO_DIRECTORY}/Makefile.in.in" "${_KEYWORDS}\n")
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS)
+    elseif(_ARG_UBUNTU_SDK_DEFAULTS)
+        set(_UBUNTU_SDK_DEFAULT_KEYWORDS "tr" "tr:1,2" "dtr:2" "dtr:2,3")
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS)
     endif()
-
+    
     if(_ARG_POTFILES_TEMPLATE)
-        file(
-            GLOB_RECURSE _SOURCE_FILES
-            RELATIVE ${CMAKE_SOURCE_DIR}
+        set(_FILE_EXTENSIONS
             ${CMAKE_SOURCE_DIR}/*.cpp
             ${CMAKE_SOURCE_DIR}/*.cc
             ${CMAKE_SOURCE_DIR}/*.cxx
             ${CMAKE_SOURCE_DIR}/*.vala
             ${CMAKE_SOURCE_DIR}/*.c
             ${CMAKE_SOURCE_DIR}/*.h
-            ${CMAKE_SOURCE_DIR}/*.qml
-            ${CMAKE_SOURCE_DIR}/*.js
         )
+
+        if(_ARG_UBUNTU_SDK_DEFAULTS)
+            list(APPEND _FILE_EXTENSIONS ${CMAKE_SOURCE_DIR}/*.qml)
+            list(APPEND _FILE_EXTENSIONS ${CMAKE_SOURCE_DIR}/*.js)
+        endif()
+ 
+        if(_ARG_FILE_EXTENSIONS)
+            set(_FILE_EXTENSIONS ${_ARG_FILE_EXTENSIONS})
+        endif()
+
+        file(
+            GLOB_RECURSE _SOURCE_FILES
+            RELATIVE ${CMAKE_SOURCE_DIR}
+            ${_FILE_EXTENSIONS}
+        )
+
         join_list(_SOURCE_FILES "\n" GENERATED_POTFILES)
         configure_file(
             ${_ARG_POTFILES_TEMPLATE}
@@ -179,7 +210,7 @@ function(INTLTOOL_UPDATE_POTFILE)
     endforeach()
 
     add_custom_command(
-        OUTPUT "${_POT_FILE}"
+        OUTPUT "${_PO_DIRECTORY}/${_POT_FILE}"
         COMMAND ${INTLTOOL_UPDATE_EXECUTABLE} --pot ${_OUTPUT_FILE} ${_GETTEXT_PACKAGE}
         DEPENDS
           "${_PO_DIRECTORY}/POTFILES.in"
