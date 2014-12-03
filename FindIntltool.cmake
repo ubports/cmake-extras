@@ -136,6 +136,8 @@ function(INTLTOOL_UPDATE_POTFILE)
         ${CMAKE_SOURCE_DIR}/*.c
         ${CMAKE_SOURCE_DIR}/*.h
         ${CMAKE_SOURCE_DIR}/*.ini.in
+        ${CMAKE_SOURCE_DIR}/*.qml
+        ${CMAKE_SOURCE_DIR}/*.js
     )
 
     add_custom_command(
