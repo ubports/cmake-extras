@@ -46,7 +46,7 @@
 # from.
 #
 # If your translations include plural forms, the default intltool keywords
-# assuming you are using glib translation macros. If this is not the case,
+# assume you are using glib translation macros. If this is not the case,
 # you can override the extraction keywords by creating po/Makefile.in.in
 # with the following contents:
 # XGETTEXT_KEYWORDS=--c++ --keyword=_ --keyword=N_ --keyword=_:1,2
