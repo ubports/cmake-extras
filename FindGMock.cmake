@@ -13,6 +13,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Build with system gmock and embedded gtest
+#
+# Usage:
+#
+# find_package(GMock)
+#
+# ...
+#
+# target_link_libraries(
+#   my-target
+#   ${GTEST_BOTH_LIBRARIES}
+# )
+#
+# NOTE: Due to the way this package finder is implemented, do not attempt
+# to find the GMock package more than once.
 
 set (GMOCK_INCLUDE_DIRS "/usr/include/gmock/include" CACHE PATH "gmock source include directory")
 set (GMOCK_SOURCE_DIR "/usr/src/gmock" CACHE PATH "gmock source directory")
