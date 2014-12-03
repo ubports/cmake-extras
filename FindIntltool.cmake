@@ -137,7 +137,7 @@ function(INTLTOOL_UPDATE_POTFILE)
         foreach(_KEYWORD ${_ARG_KEYWORDS})
             set(_KEYWORDS "${_KEYWORDS} --keyword=${_KEYWORD}")
         endforeach()
-        file(WRITE "${CMAKE_SOURCE_DIR}/po/Makefile.in.in" "${_KEYWORDS}\n")
+        file(WRITE "${_PO_DIRECTORY}/Makefile.in.in" "${_KEYWORDS}\n")
     endif()
 
     if(_ARG_POTFILES_TEMPLATE)
@@ -156,14 +156,14 @@ function(INTLTOOL_UPDATE_POTFILE)
         join_list(_SOURCE_FILES "\n" GENERATED_POTFILES)
         configure_file(
             ${_ARG_POTFILES_TEMPLATE}
-            "${CMAKE_SOURCE_DIR}/po/POTFILES.in"
+            "${_PO_DIRECTORY}/POTFILES.in"
         )
     endif()
     
     # Read in the POTFILES
     file(
         STRINGS
-        "${CMAKE_SOURCE_DIR}/po/POTFILES.in"
+        "${_PO_DIRECTORY}/POTFILES.in"
          _POTFILES_LINES
     )
 
