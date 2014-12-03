@@ -99,14 +99,6 @@ find_package_handle_standard_args(
     HANDLE_COMPONENTS
 )
 
-function(APPEND_EACH LISTNAME GLUE OUTPUT)
-    set(_tmp_list "")
-    foreach(VAL ${${LISTNAME}})
-        list(APPEND _tmp_list "${GLUE}${VAL}")
-    endforeach(VAL ${${LISTNAME}})
-    set(${OUTPUT} "${_tmp_list}" PARENT_SCOPE)
-endfunction()
-
 function(INTLTOOL_UPDATE_POTFILE)
     set(_options ALL)
     set(_oneValueArgs GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY)
