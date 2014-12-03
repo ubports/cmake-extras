@@ -154,7 +154,6 @@ function(INTLTOOL_UPDATE_POTFILE)
             ${CMAKE_SOURCE_DIR}/*.js
         )
         join_list(_SOURCE_FILES "\n" GENERATED_POTFILES)
-        message("HELLO POTFILES ${GENERATED_POTFILES}")
         configure_file(
             ${_ARG_POTFILES_TEMPLATE}
             "${CMAKE_SOURCE_DIR}/po/POTFILES.in"
