@@ -27,13 +27,16 @@
 #
 # Inside po/CMakeLists.txt:
 #
-#
 # intltool_update_potfile(
 #     ALL
 #     KEYWORDS "_" "_:1,2" "N_" "N_:1,2"
 #     POTFILES_TEMPLATE "POTFILES.in.in"
 #     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
 # )
+#
+# NOTE: It is recommended to include N_ in the keywords list, as
+# xgettext uses this keyword when extracting translations from
+# ini files.
 #
 # or
 #
@@ -51,10 +54,14 @@
 #     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
 # )
 #
-# Either you must include a po/POTFILES.in file or use the POTFILES_TEMPLATE
-# argument and pass a file such as:
+# NOTE: Either you must include a po/POTFILES.in file or use the
+# POTFILES_TEMPLATE argument and pass a file such as:
 # [type: gettext/ini] data/foo.ini.in
 # @GENERATED_POTFILES@
+#
+# NOTE: It is recommended to add both 'po/Makefile.in.in' and
+# 'po/POTFILES.in' to your source control system's exclusions
+# file.
 
 find_package(Gettext REQUIRED)
 
