@@ -104,7 +104,7 @@ find_package_handle_standard_args(
     HANDLE_COMPONENTS
 )
 
-function(JOIN_LIST LISTNAME GLUE OUTPUT)
+function(_INTLTOOL_JOIN_LIST LISTNAME GLUE OUTPUT)
     set(_tmp "")
     set(_first true)
     foreach(VAL ${${LISTNAME}})
@@ -126,10 +126,22 @@ macro(_WRITE_INTLTOOL_MAKEFILE_IN ARG_PO_DIRECTORY ARG_KEYWORDS)
     file(WRITE "${ARG_PO_DIRECTORY}/Makefile.in.in" "${_KEYWORDS}\n")
 endmacro()
 
+function(_INTLTOOL_EXCLUDE_PATH LISTNAME FILTER OUTPUT)
+     string(LENGTH ${FILTER} _FILTER_LENGTH)
+     foreach(_PATH ${${LISTNAME}})
+        set(_ABS_PATH "${CMAKE_SOURCE_DIR}/${_PATH}")
+        string(SUBSTRING ${_ABS_PATH} 0 ${_FILTER_LENGTH} _PATH_HEAD)
+        if(NOT ${_PATH_HEAD} STREQUAL ${FILTER})
+            list(APPEND _TMP ${_PATH})
+        endif()
+    endforeach()
+    set(${OUTPUT} "${_TMP}" PARENT_SCOPE)
+endfunction()
+
 function(INTLTOOL_UPDATE_POTFILE)
     set(_options ALL UBUNTU_SDK_DEFAULTS)
     set(_oneValueArgs GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
-    set(_multiValueArgs KEYWORDS FILE_EXTENSIONS)
+    set(_multiValueArgs KEYWORDS FILE_GLOBS)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
     
@@ -155,12 +167,12 @@ function(INTLTOOL_UPDATE_POTFILE)
     if(_ARG_KEYWORDS)
         _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS)
     elseif(_ARG_UBUNTU_SDK_DEFAULTS)
-        set(_UBUNTU_SDK_DEFAULT_KEYWORDS "tr" "tr:1,2" "dtr:2" "dtr:2,3")
+        set(_UBUNTU_SDK_DEFAULT_KEYWORDS "tr" "tr:1,2" "dtr:2" "dtr:2,3" "N_")
         _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS)
     endif()
     
     if(_ARG_POTFILES_TEMPLATE)
-        set(_FILE_EXTENSIONS
+        set(_FILE_GLOBS
             ${CMAKE_SOURCE_DIR}/*.cpp
             ${CMAKE_SOURCE_DIR}/*.cc
             ${CMAKE_SOURCE_DIR}/*.cxx
@@ -170,21 +182,26 @@ function(INTLTOOL_UPDATE_POTFILE)
         )
 
         if(_ARG_UBUNTU_SDK_DEFAULTS)
-            list(APPEND _FILE_EXTENSIONS ${CMAKE_SOURCE_DIR}/*.qml)
-            list(APPEND _FILE_EXTENSIONS ${CMAKE_SOURCE_DIR}/*.js)
+            list(APPEND _FILE_GLOBS ${CMAKE_SOURCE_DIR}/*.qml)
+            list(APPEND _FILE_GLOBS ${CMAKE_SOURCE_DIR}/*.js)
         endif()
  
-        if(_ARG_FILE_EXTENSIONS)
-            set(_FILE_EXTENSIONS ${_ARG_FILE_EXTENSIONS})
+        if(_ARG_FILE_GLOBS)
+            set(_FILE_GLOBS ${_ARG_FILE_GLOBS})
         endif()
 
         file(
             GLOB_RECURSE _SOURCE_FILES
             RELATIVE ${CMAKE_SOURCE_DIR}
-            ${_FILE_EXTENSIONS}
+            ${_FILE_GLOBS}
         )
 
-        join_list(_SOURCE_FILES "\n" GENERATED_POTFILES)
+        # We don't want to include paths from the binary directory
+        _intltool_exclude_path(_SOURCE_FILES ${CMAKE_BINARY_DIR} _FILTERED_SOURCE_FILES)
+
+        # Build the text to substitute into the POTFILES.in
+        _intltool_join_list(_FILTERED_SOURCE_FILES "\n" GENERATED_POTFILES)
+
         configure_file(
             ${_ARG_POTFILES_TEMPLATE}
             "${_PO_DIRECTORY}/POTFILES.in"
@@ -210,12 +227,15 @@ function(INTLTOOL_UPDATE_POTFILE)
     endforeach()
 
     add_custom_command(
-        OUTPUT "${_PO_DIRECTORY}/${_POT_FILE}"
-        COMMAND ${INTLTOOL_UPDATE_EXECUTABLE} --pot ${_OUTPUT_FILE} ${_GETTEXT_PACKAGE}
+        OUTPUT
+          "${_PO_DIRECTORY}/${_POT_FILE}"
+        COMMAND
+          ${INTLTOOL_UPDATE_EXECUTABLE} --pot ${_OUTPUT_FILE} ${_GETTEXT_PACKAGE}
         DEPENDS
           "${_PO_DIRECTORY}/POTFILES.in"
           ${_CODE_SOURCES}
-        WORKING_DIRECTORY ${_PO_DIRECTORY}
+        WORKING_DIRECTORY
+          ${_PO_DIRECTORY}
     )
     
     _GETTEXT_GET_UNIQUE_TARGET_NAME(${_POT_FILE} _UNIQUE_TARGET_NAME)
@@ -225,13 +245,13 @@ function(INTLTOOL_UPDATE_POTFILE)
           ${_UNIQUE_TARGET_NAME}
           ALL
           DEPENDS
-            ${_POT_FILE}
+            "${_PO_DIRECTORY}/${_POT_FILE}"
         )
     else()
         add_custom_target(
           ${_UNIQUE_TARGET_NAME}
           DEPENDS
-            ${_POT_FILE}
+            "${_PO_DIRECTORY}/${_POT_FILE}"
         )
     endif()
 endfunction()
