@@ -12,6 +12,7 @@ Vcs-Bzr: lp:cmake-extras
 
 Package: cmake-extras
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}
 Description: Extra CMake utility modules.
  Includes coverage modules.

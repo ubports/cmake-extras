@@ -1,3 +1,13 @@
+cmake-extras (0.2+14.10.20140910-0ubuntu2) vivid; urgency=low
+
+  * debian/control:
+    - add "Multi-Arch: foreign" to allow installing in a click
+      crossbuild chroot
+  * UseXGettext.cmake:
+    - add missing "ALL" in xgettext_create_pot_file
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Thu, 30 Oct 2014 11:32:25 +0100
+
 cmake-extras (0.2+14.10.20140910-0ubuntu1) utopic; urgency=low
 
   [ Pete Woods ]

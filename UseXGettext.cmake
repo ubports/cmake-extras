@@ -85,6 +85,7 @@ macro(add_translations_catalog)
 
     xgettext_create_pot_file(
         ${_POT_FILE}
+        ALL
         CPP
         QT
         INPUT ${_SOURCES}
