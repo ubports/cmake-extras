@@ -1,9 +1,13 @@
-cmake-extras (0.3-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (0.3+15.04.20141204-0ubuntu1) vivid; urgency=medium
 
   [ Pete Woods ]
   * Add GMock macros.
+  * Add intltool macros
 
- -- Pete Woods <pete.woods@canonical.com>  Wed, 03 Dec 2014 09:08:53 +0000
+  [ Daniel Holbach ]
+  * Move files to /usr/share/cmake-3.0. (LP: #1394648)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 04 Dec 2014 20:53:33 +0000
 
 cmake-extras (0.2+14.10.20140910-0ubuntu2) vivid; urgency=low
 
