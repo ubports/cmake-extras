@@ -1,3 +1,10 @@
+cmake-extras (0.3-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pete Woods ]
+  * Add GMock macros.
+
+ -- Pete Woods <pete.woods@canonical.com>  Wed, 03 Dec 2014 09:08:53 +0000
+
 cmake-extras (0.2+14.10.20140910-0ubuntu2) vivid; urgency=low
 
   * debian/control:
