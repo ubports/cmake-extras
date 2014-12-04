@@ -20,6 +20,7 @@ License: LGPL-3
  `/usr/share/common-licenses/LGPL-3'
 
 Files: FindGMock.cmake
+ FindIntltool.cmake
  FindXGettext.cmake
  UseXGettext.cmake
 Copyright: 2014 Canonical Ltd.
