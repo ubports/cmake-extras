@@ -171,3 +171,9 @@ macro(export_qmlplugin PLUGIN VERSION PATH)
         )
     endif()
 endmacro()
+
+
+macro(add_qmlplugin PLUGIN VERSION PATH)
+    export_qmlfiles(${PLUGIN} ${PATH} ${ARGN})
+    export_qmlplugin(${PLUGIN} ${VERSION} ${PATH} ${ARGN})
+endmacro()
