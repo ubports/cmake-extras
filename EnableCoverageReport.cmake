@@ -77,6 +77,10 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
             SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
         ENDFOREACH()
 
+        FOREACH(T ${ENABLE_COVERAGE_REPORT_TESTS})
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
+        ENDFOREACH()
+
         # html report
         IF (LCOV_FOUND)
         
