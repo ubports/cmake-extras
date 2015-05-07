@@ -12,17 +12,6 @@ if(NOT TARGET qmlplugindump)
     set_target_properties(qmlplugindump PROPERTIES IMPORTED_LOCATION ${qmlplugindump_exe})
 endif()
 
-# Qt5's cmake does not export QT_IMPORTS_DIR, lets query qmake on our own for now
-get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
-function(_QUERY_QMAKE VAR RESULT)
-  exec_program(${QMAKE_EXECUTABLE} ARGS "-query ${VAR}" RETURN_VALUE return_code OUTPUT_VARIABLE output )
-  if(NOT return_code)
-    file(TO_CMAKE_PATH "${output}" output)
-    set(${RESULT} ${output} PARENT_SCOPE)
-  endif(NOT return_code)
-endfunction()
-_query_qmake(QT_INSTALL_QML _QT_IMPORTS_DIR)
-
 #
 # A custom target for building the qmltypes files manually.
 #
@@ -47,10 +36,12 @@ endif()
 # Created target:
 #   - ${TARGET_PREFIX}${plugin}-qmlfiles - Copies resources into the binary dir.
 
-macro(export_qmlfiles PLUGIN PATH)
+function(export_qmlfiles PLUGIN PATH)
     set(single SEARCH_PATH BINARY_DIR DESTINATION TARGET_PREFIX)
     cmake_parse_arguments(QMLFILES "" "${single}" "" ${ARGN})
  
+    set(QMLFILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+
     if(NOT QMLFILES_SEARCH_PATH)
         set(QMLFILES_SEARCH_PATH ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
@@ -81,18 +72,11 @@ macro(export_qmlfiles PLUGIN PATH)
                         SOURCES ${QMLFILES}
     )
 
-    if(QMLFILES_DESTINATION)
-        # install the qmlfiles file.
-        install(FILES ${QMLFILES}
-            DESTINATION ${QMLFILES_DESTINATION}/${PATH}
-        )
-    else()
-        _query_qmake(QT_INSTALL_QML _QMLPLUGIN_DESTINATION)
-        install(FILES ${QMLFILES}
-                DESTINATION ${_QMLPLUGIN_DESTINATION}/${PATH}
-        )
-    endif()
-endmacro()
+    # install the qmlfiles file.
+    install(FILES ${QMLFILES}
+        DESTINATION ${QMLFILES_DESTINATION}/${PATH}
+    )
+endfunction()
 
 
 # Creates a target for generating the typeinfo file for a QML plugin and/or installs the plugin
@@ -117,13 +101,13 @@ endmacro()
 #   - ${TARGET_PREFIX}${plugin}-qmltypes - Generates the qmltypes file in the source dir.
 #     It will be made a dependency of the "qmltypes" target.
 
-macro(export_qmlplugin PLUGIN VERSION PATH)
+function(export_qmlplugin PLUGIN VERSION PATH)
     set(options NO_TYPES)
     set(single BINARY_DIR DESTINATION TARGET_PREFIX ENVIRONMENT)
     set(multi TARGETS)
     cmake_parse_arguments(QMLPLUGIN "${options}" "${single}" "${multi}" ${ARGN})
 
-    get_target_property(qmlplugindump_executable qmlplugindump LOCATION)
+    set(QMLPLUGIN_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
 
     if(QMLPLUGIN_BINARY_DIR)
         set(qmlplugin_dir ${QMLPLUGIN_BINARY_DIR}/${PATH})
@@ -143,7 +127,7 @@ macro(export_qmlplugin PLUGIN VERSION PATH)
         set(qmltypes_path ${CMAKE_CURRENT_SOURCE_DIR}/${plugin_suffix}.qmltypes)
 
         add_custom_target(${target_prefix}-qmltypes
-            COMMAND env ${QMLPLUGIN_ENVIRONMENT} ${qmlplugindump_executable} -notrelocatable
+            COMMAND env ${QMLPLUGIN_ENVIRONMENT} $<TARGET_FILE:qmlplugindump> -notrelocatable
                     ${PLUGIN} ${VERSION} ${QMLPLUGIN_MODULE_DIR} > ${qmltypes_path}
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
@@ -159,21 +143,14 @@ macro(export_qmlplugin PLUGIN VERSION PATH)
                           RUNTIME_OUTPUT_DIRECTORY ${qmlplugin_dir}
     )
 
-    if (QMLPLUGIN_DESTINATION)
-        # Install additional targets
-        install(TARGETS ${QMLPLUGIN_TARGETS}
-                DESTINATION ${QMLPLUGIN_DESTINATION}/${PATH}
-        )
-    else()
-        _query_qmake(QT_INSTALL_QML _QMLPLUGIN_DESTINATION)
-        install(TARGETS ${QMLPLUGIN_TARGETS}
-                DESTINATION ${_QMLPLUGIN_DESTINATION}/${PATH}
-        )
-    endif()
-endmacro()
+    # Install additional targets
+    install(TARGETS ${QMLPLUGIN_TARGETS}
+        DESTINATION ${QMLPLUGIN_DESTINATION}/${PATH}
+    )
+endfunction()
 
 
-macro(add_qmlplugin PLUGIN VERSION PATH)
+function(add_qmlplugin PLUGIN VERSION PATH)
     export_qmlfiles(${PLUGIN} ${PATH} ${ARGN})
     export_qmlplugin(${PLUGIN} ${VERSION} ${PATH} ${ARGN})
-endmacro()
+endfunction()
