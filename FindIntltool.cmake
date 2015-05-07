@@ -249,9 +249,10 @@ function(INTLTOOL_UPDATE_POTFILE)
         OUTPUT
           "${_PO_DIRECTORY}/${_POT_FILE}"
         COMMAND
-          ${INTLTOOL_UPDATE_EXECUTABLE} --pot ${_OUTPUT_FILE} ${_GETTEXT_PACKAGE}
+          "${INTLTOOL_UPDATE_EXECUTABLE}" --pot "${_OUTPUT_FILE}" "${_GETTEXT_PACKAGE}"
         DEPENDS
           "${_PO_DIRECTORY}/POTFILES.in"
+          "${_PO_DIRECTORY}/Makefile.in.in"
           ${_CODE_SOURCES}
         WORKING_DIRECTORY
           ${_PO_DIRECTORY}
@@ -311,13 +312,13 @@ function(INTLTOOL_INSTALL_TRANSLATIONS)
 
     if(_ARG_ALL)
         gettext_create_translations(
-          ${_POT_FILE}
+          ${_ABS_POT_FILE}
           ALL
           ${_PO_FILES}
         )
     else()
         gettext_create_translations(
-          ${_POT_FILE}
+          ${_ABS_POT_FILE}
           ${_PO_FILES}
         )
     endif()
