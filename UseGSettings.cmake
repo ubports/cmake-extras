@@ -1,15 +1,15 @@
 # GSettings.cmake, CMake macros written for Marlin, feel free to re-use them.
 
-option (GSETTINGS_LOCALINSTALL "Install GSettings Schemas locally instead of to the GLib prefix" OFF)
+option (GSETTINGS_LOCALINSTALL "Install GSettings schemas locally instead of to the GLib prefix" OFF)
 
-option (GSETTINGS_COMPILE "Compile GSettings Schemas after installation" OFF)
+option (GSETTINGS_COMPILE "Compile GSettings schemas after installation" OFF)
 
 if(GSETTINGS_LOCALINSTALL)
     message(STATUS "GSettings schemas will be installed locally.")
 endif()
 
 if(GSETTINGS_COMPILE)
-    message(STATUS "GSettings shemas will be compiled.")
+    message(STATUS "GSettings schemas will be compiled.")
 endif()
 
 macro(add_schema SCHEMA_NAME)
