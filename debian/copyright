@@ -23,6 +23,8 @@ Files: FindGMock.cmake
  FindIntltool.cmake
  FindXGettext.cmake
  UseXGettext.cmake
+ UseDoxygen.cmake
+ UseDoxygen.Doxyfile.in
 Copyright: 2014 Canonical Ltd.
 License: LGPL-3
  This file may be licensed under the terms of the
