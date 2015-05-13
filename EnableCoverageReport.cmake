@@ -60,7 +60,8 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
         MESSAGE(STATUS "Cannot enable coverage targets because neither lcov nor gcovr are found.")
     ENDIF()
     
-    IF(CMAKE_COMPILER_IS_GNUCXX AND TOOL_FOUND AND "${enable_coverage}")
+    STRING(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_CMAKE_BUILD_TYPE)
+    IF(CMAKE_COMPILER_IS_GNUCXX AND TOOL_FOUND AND "${LOWER_CMAKE_BUILD_TYPE}" STREQUAL "coverage")
     
         MESSAGE(STATUS "Coverage support enabled for targets: ${ENABLE_COVERAGE_REPORT_TARGETS}")
     
@@ -70,9 +71,16 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
         SET(CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES} coverage PARENT_SCOPE)
     
         # instrument targets
-        SET_TARGET_PROPERTIES(${ENABLE_COVERAGE_REPORT_TARGETS} PROPERTIES COMPILE_FLAGS --coverage
-                                                        LINK_FLAGS --coverage)
-    
+
+        FOREACH(T ${ENABLE_COVERAGE_REPORT_TARGETS})
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY COMPILE_FLAGS "-g --coverage ")
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
+        ENDFOREACH()
+
+        FOREACH(T ${ENABLE_COVERAGE_REPORT_TESTS})
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
+        ENDFOREACH()
+
         # html report
         IF (LCOV_FOUND)
         
@@ -154,4 +162,8 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
                           
     ENDIF()
 
-ENDFUNCTION()   
+    # This gets rid of any stale .gcda files. Run this if a running a binary causes lots of
+    # messages about about a "merge mismatch for summaries".
+    ADD_CUSTOM_TARGET(clean-coverage COMMAND find ${CMAKE_BINARY_DIR} -name '*.gcda' | xargs rm -f)
+
+ENDFUNCTION()
