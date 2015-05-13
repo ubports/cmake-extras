@@ -125,8 +125,11 @@ function(_INTLTOOL_JOIN_LIST LISTNAME GLUE OUTPUT)
     set(${OUTPUT} "${_tmp}" PARENT_SCOPE)
 endfunction()
 
-macro(_WRITE_INTLTOOL_MAKEFILE_IN ARG_PO_DIRECTORY ARG_KEYWORDS)
+macro(_WRITE_INTLTOOL_MAKEFILE_IN ARG_PO_DIRECTORY ARG_KEYWORDS ARG_COPYRIGHT_HOLDER)
     set(_KEYWORDS "XGETTEXT_KEYWORDS=--c++")
+    if(NOT "${ARG_COPYRIGHT_HOLDER}" STREQUAL "")
+        set(_KEYWORDS "${_KEYWORDS} --copyright-holder='${ARG_COPYRIGHT_HOLDER}'")
+    endif()
     foreach(_KEYWORD ${${ARG_KEYWORDS}})
         set(_KEYWORDS "${_KEYWORDS} --keyword=${_KEYWORD}")
     endforeach()
@@ -137,9 +140,13 @@ function(_INTLTOOL_EXCLUDE_PATH LISTNAME FILTER OUTPUT)
      string(LENGTH ${FILTER} _FILTER_LENGTH)
      foreach(_PATH ${${LISTNAME}})
         set(_ABS_PATH "${CMAKE_SOURCE_DIR}/${_PATH}")
-        string(SUBSTRING ${_ABS_PATH} 0 ${_FILTER_LENGTH} _PATH_HEAD)
-        if(NOT ${_PATH_HEAD} STREQUAL ${FILTER})
-            list(APPEND _TMP ${_PATH})
+        string(LENGTH "${_ABS_PATH}" _ABS_PATH_LENGTH)
+        # If the path is at least as long as the filter
+        if(NOT (${_FILTER_LENGTH} GREATER ${_ABS_PATH_LENGTH}))
+            string(SUBSTRING ${_ABS_PATH} 0 ${_FILTER_LENGTH} _PATH_HEAD)
+            if(NOT ${_PATH_HEAD} STREQUAL ${FILTER})
+                list(APPEND _TMP ${_PATH})
+            endif()
         endif()
     endforeach()
     set(${OUTPUT} "${_TMP}" PARENT_SCOPE)
@@ -147,7 +154,7 @@ endfunction()
 
 function(INTLTOOL_UPDATE_POTFILE)
     set(_options ALL UBUNTU_SDK_DEFAULTS)
-    set(_oneValueArgs GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
+    set(_oneValueArgs COPYRIGHT_HOLDER GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
     set(_multiValueArgs KEYWORDS FILE_GLOBS)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
@@ -172,46 +179,51 @@ function(INTLTOOL_UPDATE_POTFILE)
     endif()
 
     if(_ARG_KEYWORDS)
-        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS)
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS ${_ARG_COPYRIGHT_HOLDER})
     elseif(_ARG_UBUNTU_SDK_DEFAULTS)
         set(_UBUNTU_SDK_DEFAULT_KEYWORDS "tr" "tr:1,2" "dtr:2" "dtr:2,3" "N_")
-        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS)
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS ${_ARG_COPYRIGHT_HOLDER})
     endif()
     
-    if(_ARG_POTFILES_TEMPLATE)
-        set(_FILE_GLOBS
-            ${CMAKE_SOURCE_DIR}/*.cpp
-            ${CMAKE_SOURCE_DIR}/*.cc
-            ${CMAKE_SOURCE_DIR}/*.cxx
-            ${CMAKE_SOURCE_DIR}/*.vala
-            ${CMAKE_SOURCE_DIR}/*.c
-            ${CMAKE_SOURCE_DIR}/*.h
-        )
+    set(_FILE_GLOBS
+        ${CMAKE_SOURCE_DIR}/*.cpp
+        ${CMAKE_SOURCE_DIR}/*.cc
+        ${CMAKE_SOURCE_DIR}/*.cxx
+        ${CMAKE_SOURCE_DIR}/*.vala
+        ${CMAKE_SOURCE_DIR}/*.c
+        ${CMAKE_SOURCE_DIR}/*.h
+    )
 
-        if(_ARG_UBUNTU_SDK_DEFAULTS)
-            list(APPEND _FILE_GLOBS ${CMAKE_SOURCE_DIR}/*.qml)
-            list(APPEND _FILE_GLOBS ${CMAKE_SOURCE_DIR}/*.js)
-        endif()
+    if(_ARG_UBUNTU_SDK_DEFAULTS)
+        list(APPEND _FILE_GLOBS ${CMAKE_SOURCE_DIR}/*.qml)
+        list(APPEND _FILE_GLOBS ${CMAKE_SOURCE_DIR}/*.js)
+    endif()
  
-        if(_ARG_FILE_GLOBS)
-            set(_FILE_GLOBS ${_ARG_FILE_GLOBS})
-        endif()
+    if(_ARG_FILE_GLOBS)
+        set(_FILE_GLOBS ${_ARG_FILE_GLOBS})
+    endif()
 
-        file(
-            GLOB_RECURSE _SOURCE_FILES
-            RELATIVE ${CMAKE_SOURCE_DIR}
-            ${_FILE_GLOBS}
-        )
+    file(
+        GLOB_RECURSE _SOURCE_FILES
+        RELATIVE ${CMAKE_SOURCE_DIR}
+        ${_FILE_GLOBS}
+    )
 
-        # We don't want to include paths from the binary directory
-        _intltool_exclude_path(_SOURCE_FILES ${CMAKE_BINARY_DIR} _FILTERED_SOURCE_FILES)
+    # We don't want to include paths from the binary directory
+    _intltool_exclude_path(_SOURCE_FILES ${CMAKE_BINARY_DIR} _FILTERED_SOURCE_FILES)
 
-        # Build the text to substitute into the POTFILES.in
-        _intltool_join_list(_FILTERED_SOURCE_FILES "\n" GENERATED_POTFILES)
+    # Build the text to substitute into the POTFILES.in
+    _intltool_join_list(_FILTERED_SOURCE_FILES "\n" GENERATED_POTFILES)
 
+    if(_ARG_POTFILES_TEMPLATE)
         configure_file(
             ${_ARG_POTFILES_TEMPLATE}
             "${_PO_DIRECTORY}/POTFILES.in"
+        )
+    else()
+        file(WRITE
+            "${_PO_DIRECTORY}/POTFILES.in"
+            "${GENERATED_POTFILES}\n"
         )
     endif()
     
@@ -237,9 +249,10 @@ function(INTLTOOL_UPDATE_POTFILE)
         OUTPUT
           "${_PO_DIRECTORY}/${_POT_FILE}"
         COMMAND
-          ${INTLTOOL_UPDATE_EXECUTABLE} --pot ${_OUTPUT_FILE} ${_GETTEXT_PACKAGE}
+          "${INTLTOOL_UPDATE_EXECUTABLE}" --pot "${_OUTPUT_FILE}" "${_GETTEXT_PACKAGE}"
         DEPENDS
           "${_PO_DIRECTORY}/POTFILES.in"
+          "${_PO_DIRECTORY}/Makefile.in.in"
           ${_CODE_SOURCES}
         WORKING_DIRECTORY
           ${_PO_DIRECTORY}
@@ -299,13 +312,13 @@ function(INTLTOOL_INSTALL_TRANSLATIONS)
 
     if(_ARG_ALL)
         gettext_create_translations(
-          ${_POT_FILE}
+          ${_ABS_POT_FILE}
           ALL
           ${_PO_FILES}
         )
     else()
         gettext_create_translations(
-          ${_POT_FILE}
+          ${_ABS_POT_FILE}
           ${_PO_FILES}
         )
     endif()

@@ -1,3 +1,10 @@
+cmake-extras (0.4-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pete Woods ]
+  * Add QmlPlugin macros.
+
+ -- Pete Woods <pete.woods@canonical.com>  Tue, 28 Apr 2015 14:54:16 +0100
+
 cmake-extras (0.3+15.04.20141204-0ubuntu1) vivid; urgency=medium
 
   [ Pete Woods ]
