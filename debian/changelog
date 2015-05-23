@@ -1,3 +1,15 @@
+cmake-extras (0.4+15.04.20150513-0ubuntu1) vivid; urgency=medium
+
+  [ Pete Woods ]
+  * Add QmlPlugin macros.
+  * Add Doxygen macro added: UseDoxygen.Doxyfile.in UseDoxygen.cmake
+  * Add GSettings macro added: UseGSettings.cmake
+
+  [ Michi Henning ]
+  * Added clean-coverage target
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 13 May 2015 15:19:10 +0000
+
 cmake-extras (0.3+15.04.20141204-0ubuntu1) vivid; urgency=medium
 
   [ Pete Woods ]
