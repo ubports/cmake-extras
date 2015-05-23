@@ -116,11 +116,7 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
             # filter unwanted stuff
             LIST(LENGTH ENABLE_COVERAGE_REPORT_FILTER FILTER_LENGTH)
             IF(${FILTER_LENGTH} GREATER 0)
-                SET(FILTER COMMAND ${LCOV_EXECUTABLE})
-                FOREACH(F ${ENABLE_COVERAGE_REPORT_FILTER})
-                    SET(FILTER ${FILTER} -r ${COVERAGE_FILTERED_FILE} ${F})
-                ENDFOREACH()
-                SET(FILTER ${FILTER} -o ${COVERAGE_FILTERED_FILE})
+                SET(FILTER COMMAND ${LCOV_EXECUTABLE} -r ${COVERAGE_FILTERED_FILE} ${ENABLE_COVERAGE_REPORT_FILTER} -o  ${COVERAGE_FILTERED_FILE})
             ELSE()
                 SET(FILTER "")
             ENDIF()
@@ -147,13 +143,23 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
         IF(GCOVR_FOUND)
         
             MESSAGE(STATUS "Enabling XML coverage report")
-        
+
+            # filter unwanted stuff
+            SET(GCOVR_FILTER "")
+            FOREACH(F ${ENABLE_COVERAGE_REPORT_FILTER})
+                # Half arsed glob to regexp conversion:
+                STRING(REPLACE "." "\\." F ${F})
+                STRING(REPLACE "?" "[^/]" F ${F})
+                STRING(REPLACE "*" "[^/]*" F ${F})
+                SET(GCOVR_FILTER "${GCOVR_FILTER} -e \"^${F}\\$\" -e \"^${F}/\"")
+            ENDFOREACH()
+
             # gcovr cannot write directly to a file so the execution needs to
             # be wrapped in a cmake file that generates the file output
             FILE(WRITE ${COVERAGE_XML_COMMAND_FILE}
                  "SET(ENV{LANG} en)\n")
             FILE(APPEND ${COVERAGE_XML_COMMAND_FILE}
-                 "EXECUTE_PROCESS(COMMAND \"${GCOVR_EXECUTABLE}\" -x -r \"${CMAKE_SOURCE_DIR}\" OUTPUT_FILE \"${COVERAGE_XML_FILE}\" WORKING_DIRECTORY \"${CMAKE_BINARY_DIR}\")\n")
+                 "EXECUTE_PROCESS(COMMAND \"${GCOVR_EXECUTABLE}\" -x -r \"${CMAKE_SOURCE_DIR}\" ${GCOVR_FILTER} OUTPUT_FILE \"${COVERAGE_XML_FILE}\" WORKING_DIRECTORY \"${CMAKE_BINARY_DIR}\")\n")
         
             ADD_CUSTOM_COMMAND(OUTPUT ${COVERAGE_XML_FILE}
                                COMMAND ${CMAKE_COMMAND} ARGS -P ${COVERAGE_XML_COMMAND_FILE}
