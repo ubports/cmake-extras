@@ -1,2 +1,2 @@
-*.cmake /usr/share/cmake-3.0/Modules/
-*.in /usr/share/cmake-3.0/Modules/
+*.cmake /usr/share/cmake-3.2/Modules/
+*.in /usr/share/cmake-3.2/Modules/
