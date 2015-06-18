@@ -1,3 +1,10 @@
+cmake-extras (0.4+15.10.20150618-0ubuntu1) wily; urgency=medium
+
+  [ Pete Woods ]
+  * Move scripts to cmake-3.2 dir for compatibility with Wily
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Thu, 18 Jun 2015 11:56:32 +0000
+
 cmake-extras (0.4+15.04.20150513-0ubuntu1) vivid; urgency=medium
 
   [ Pete Woods ]
