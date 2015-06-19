@@ -2,9 +2,9 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: cmake-extras
 Source: https://launchpad.net/cmake-extras
 
-Files: Findgcovr.cmake
- FindLcov.cmake
- EnableCoverageReport.cmake
+Files: src/Findgcovr.cmake
+ src/FindLcov.cmake
+ src/EnableCoverageReport.cmake
 Copyright: 2010 Johannes Wienke <jwienke@techfak.uni-bielefeld.de>
 License: LGPL-3
  This file may be licensed under the terms of the
@@ -19,12 +19,12 @@ License: LGPL-3
  On Debian/Ubuntu systems, the full text of the LGPL v3 can be found in
  `/usr/share/common-licenses/LGPL-3'
 
-Files: FindGMock.cmake
- FindIntltool.cmake
- FindXGettext.cmake
- UseXGettext.cmake
- UseDoxygen.cmake
- UseDoxygen.Doxyfile.in
+Files: src/FindGMock.cmake
+ src/FindIntltool.cmake
+ src/FindXGettext.cmake
+ src/UseXGettext.cmake
+ src/UseDoxygen.cmake
+ src/UseDoxygen.Doxyfile.in
 Copyright: 2014 Canonical Ltd.
 License: LGPL-3
  This file may be licensed under the terms of the
