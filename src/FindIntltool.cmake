@@ -141,8 +141,11 @@ function(_INTLTOOL_EXCLUDE_PATH LISTNAME FILTER OUTPUT)
      foreach(_PATH ${${LISTNAME}})
         set(_ABS_PATH "${CMAKE_SOURCE_DIR}/${_PATH}")
         string(LENGTH "${_ABS_PATH}" _ABS_PATH_LENGTH)
-        # If the path is at least as long as the filter
-        if(NOT (${_FILTER_LENGTH} GREATER ${_ABS_PATH_LENGTH}))
+        if(${_FILTER_LENGTH} GREATER ${_ABS_PATH_LENGTH})
+            # If the path is too short to match the filter
+            list(APPEND _TMP ${_PATH})
+        else()
+            # If the path is at least as long as the filter
             string(SUBSTRING ${_ABS_PATH} 0 ${_FILTER_LENGTH} _PATH_HEAD)
             if(NOT ${_PATH_HEAD} STREQUAL ${FILTER})
                 list(APPEND _TMP ${_PATH})
