@@ -1,3 +1,19 @@
+cmake-extras (0.4+15.10.20150622.1-0ubuntu1) wily; urgency=medium
+
+  [ Michi Henning ]
+  * Enable coverage with clang. If build type is coverage and clang is
+    used, clang emits coverage data in gcc format, so gcovr/lcov can be
+    used to generate the report.
+  * Fixes carried over from thumbnailer, made by James to correctly
+    filter XML coverage data, so we don't get tons of noise about system
+    files in the coverage report created by Jenkins.
+
+  [ Pete Woods ]
+  * Install modules using CMake to allow detection of CMake version (LP:
+    #1467030)
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Mon, 22 Jun 2015 08:55:27 +0000
+
 cmake-extras (0.4+15.10.20150618-0ubuntu1) wily; urgency=medium
 
   [ Pete Woods ]
