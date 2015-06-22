@@ -4,7 +4,7 @@
 # for selected targets. Optional arguments to this function are used to filter
 # unwanted results using globbing expressions. Moreover targets with tests for
 # the source code can be specified to trigger regenerating the report if the
-# test has changed
+# test has changed.
 #
 # ENABLE_COVERAGE_REPORT(TARGETS target... [FILTER filter...] [TESTS test targets...])
 #
@@ -39,8 +39,19 @@
 FIND_PACKAGE(Lcov)
 FIND_PACKAGE(gcovr)
 
+FUNCTION(SET_GCC_VERSION)
+    EXECUTE_PROCESS(COMMAND gcc -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    STRING(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONENTS ${GCC_VERSION})
+    LIST(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
+    LIST(GET GCC_VERSION_COMPONENTS 1 GCC_MINOR)
+    STRING(LENGTH ${GCC_MAJOR} MINOR_LEN)
+    IF(${MINOR_LEN} EQUAL 1)
+        SET(GCC_MINOR "0${GCC_MINOR}")
+    ENDIF()
+    SET(GCC_VERSION "${GCC_MAJOR}${GCC_MINOR}" PARENT_SCOPE)
+ENDFUNCTION()
+
 FUNCTION(ENABLE_COVERAGE_REPORT)
-    
     # argument parsing
     SET(MULTI_VALUE_ARGS FILTER TARGETS TESTS)
     CMAKE_PARSE_ARGUMENTS(ENABLE_COVERAGE_REPORT "" "" "${MULTI_VALUE_ARGS}" ${ARGN})
@@ -61,7 +72,7 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
     ENDIF()
     
     STRING(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_CMAKE_BUILD_TYPE)
-    IF(CMAKE_COMPILER_IS_GNUCXX AND TOOL_FOUND AND "${LOWER_CMAKE_BUILD_TYPE}" STREQUAL "coverage")
+    IF(TOOL_FOUND AND "${LOWER_CMAKE_BUILD_TYPE}" STREQUAL "coverage")
     
         MESSAGE(STATUS "Coverage support enabled for targets: ${ENABLE_COVERAGE_REPORT_TARGETS}")
     
@@ -72,9 +83,16 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
     
         # instrument targets
 
+        # If we are using Clang, tell it to generate coverage data suitable for gcovr.
+        IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+            SET_GCC_VERSION()
+            set(CLANG_COVERAGE_ARGS "-Xclang -coverage-cfg-checksum -Xclang -coverage-no-function-names-in-data -Xclang -coverage-version='${GCC_VERSION}*' ")
+        ENDIF()
+
         FOREACH(T ${ENABLE_COVERAGE_REPORT_TARGETS})
             SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY COMPILE_FLAGS "-g --coverage ")
             SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY COMPILE_FLAGS ${CLANG_COVERAGE_ARGS})
         ENDFOREACH()
 
         FOREACH(T ${ENABLE_COVERAGE_REPORT_TESTS})
