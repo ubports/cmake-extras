@@ -60,7 +60,6 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
     SET(COVERAGE_FILTERED_FILE "${CMAKE_BINARY_DIR}/coverage.info")
     SET(COVERAGE_REPORT_DIR "${CMAKE_BINARY_DIR}/coveragereport")
     SET(COVERAGE_XML_FILE "${CMAKE_BINARY_DIR}/coverage.xml")
-    SET(COVERAGE_XML_COMMAND_FILE "${CMAKE_BINARY_DIR}/coverage-xml.cmake")
     
     # decide if there is any tool to create coverage data
     SET(TOOL_FOUND FALSE)
@@ -116,11 +115,7 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
             # filter unwanted stuff
             LIST(LENGTH ENABLE_COVERAGE_REPORT_FILTER FILTER_LENGTH)
             IF(${FILTER_LENGTH} GREATER 0)
-                SET(FILTER COMMAND ${LCOV_EXECUTABLE})
-                FOREACH(F ${ENABLE_COVERAGE_REPORT_FILTER})
-                    SET(FILTER ${FILTER} -r ${COVERAGE_FILTERED_FILE} ${F})
-                ENDFOREACH()
-                SET(FILTER ${FILTER} -o ${COVERAGE_FILTERED_FILE})
+                SET(FILTER COMMAND ${LCOV_EXECUTABLE} -r ${COVERAGE_FILTERED_FILE} ${ENABLE_COVERAGE_REPORT_FILTER} -o  ${COVERAGE_FILTERED_FILE})
             ELSE()
                 SET(FILTER "")
             ENDIF()
@@ -147,16 +142,37 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
         IF(GCOVR_FOUND)
         
             MESSAGE(STATUS "Enabling XML coverage report")
-        
-            # gcovr cannot write directly to a file so the execution needs to
-            # be wrapped in a cmake file that generates the file output
-            FILE(WRITE ${COVERAGE_XML_COMMAND_FILE}
-                 "SET(ENV{LANG} en)\n")
-            FILE(APPEND ${COVERAGE_XML_COMMAND_FILE}
-                 "EXECUTE_PROCESS(COMMAND \"${GCOVR_EXECUTABLE}\" -x -r \"${CMAKE_SOURCE_DIR}\" OUTPUT_FILE \"${COVERAGE_XML_FILE}\" WORKING_DIRECTORY \"${CMAKE_BINARY_DIR}\")\n")
-        
+
+            # filter unwanted stuff
+            SET(GCOVR_FILTER "")
+            FOREACH(F ${ENABLE_COVERAGE_REPORT_FILTER})
+                # Convert the pattern to a regexp using the same rules
+                # as lcov's transform_pattern() function.
+                STRING(REPLACE "\\" "\\\\" F ${F})
+                STRING(REPLACE "/" "\\/" F ${F})
+                STRING(REPLACE "^" "\\^" F ${F})
+                STRING(REPLACE "\$" "\\\$" F ${F})
+                STRING(REPLACE "(" "\\(" F ${F})
+                STRING(REPLACE ")" "\\)" F ${F})
+                STRING(REPLACE "[" "\\[" F ${F})
+                STRING(REPLACE "]" "\\]" F ${F})
+                STRING(REPLACE "{" "\\{" F ${F})
+                STRING(REPLACE "}" "\\}" F ${F})
+                STRING(REPLACE "." "\\." F ${F})
+                STRING(REPLACE "," "\\," F ${F})
+                STRING(REPLACE "|" "\\|" F ${F})
+                STRING(REPLACE "+" "\\+" F ${F})
+                STRING(REPLACE "!" "\\!" F ${F})
+
+                STRING(REPLACE "*" ".*" F ${F})
+                STRING(REPLACE "?" "." F ${F})
+
+                SET(GCOVR_FILTER ${GCOVR_FILTER} -e "^${F}\$")
+            ENDFOREACH()
+
             ADD_CUSTOM_COMMAND(OUTPUT ${COVERAGE_XML_FILE}
-                               COMMAND ${CMAKE_COMMAND} ARGS -P ${COVERAGE_XML_COMMAND_FILE}
+                               COMMAND "${GCOVR_EXECUTABLE}" -x -r "${CMAKE_SOURCE_DIR}" ${GCOVR_FILTER} -o "${COVERAGE_XML_FILE}"
+                               WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
                                COMMENT "Generating coverage XML report"
                                VERBATIM)
                                
