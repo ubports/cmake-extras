@@ -2,7 +2,8 @@ Source: cmake-extras
 Section: libs
 Priority: extra
 Maintainer: Ubuntu QA Team <qa-team@ubuntu.com>
-Build-Depends: debhelper (>= 9)
+Build-Depends: cmake,
+               debhelper (>= 9),
 Standards-Version: 3.9.5
 Homepage: https://launchpad.net/cmake-extras
 # if you don't have have commit access to this branch but would like to upload
