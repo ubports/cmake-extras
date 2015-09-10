@@ -32,7 +32,13 @@ set (GMOCK_INCLUDE_DIRS "/usr/include/gmock/include" CACHE PATH "gmock source in
 set (GMOCK_SOURCE_DIR "/usr/src/gmock" CACHE PATH "gmock source directory")
 set (GTEST_INCLUDE_DIRS "${GMOCK_SOURCE_DIR}/gtest/include" CACHE PATH "gtest source include directory")
 
+# We add -g so we get debug info for the gtest stack frames with gdb.
+# The warnings are suppressed so we get a noise-free build for gtest and gmock if the caller
+# has these warnings enabled.
+set(old_cxx_flags ${CMAKE_CXX_FLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-old-style-cast -Wno-missing-field-initializer")
 add_subdirectory(${GMOCK_SOURCE_DIR} "${CMAKE_CURRENT_BINARY_DIR}/gmock")
+set(CMAKE_CXX_FLAGS ${old_cxx_flags})
 
 set(GTEST_LIBRARIES gtest)
 set(GTEST_MAIN_LIBRARIES gtest_main)
