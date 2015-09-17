@@ -182,10 +182,10 @@ function(INTLTOOL_UPDATE_POTFILE)
     endif()
 
     if(_ARG_KEYWORDS)
-        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS ${_ARG_COPYRIGHT_HOLDER})
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS "${_ARG_COPYRIGHT_HOLDER}")
     elseif(_ARG_UBUNTU_SDK_DEFAULTS)
         set(_UBUNTU_SDK_DEFAULT_KEYWORDS "tr" "tr:1,2" "dtr:2" "dtr:2,3" "N_")
-        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS ${_ARG_COPYRIGHT_HOLDER})
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS "${_ARG_COPYRIGHT_HOLDER}")
     endif()
     
     set(_FILE_GLOBS
