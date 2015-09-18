@@ -1,3 +1,9 @@
+cmake-extras (0.4+15.10.20150918-0ubuntu1) wily; urgency=medium
+
+  * Fix failure when no COPYRIGHT_HOLDER argument provided
+
+ -- Pete Woods <ci-train-bot@canonical.com>  Fri, 18 Sep 2015 08:34:37 +0000
+
 cmake-extras (0.4+15.10.20150622.1-0ubuntu1) wily; urgency=medium
 
   [ Michi Henning ]
