@@ -85,17 +85,17 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
         # If we are using Clang, tell it to generate coverage data suitable for gcovr.
         IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
             SET_GCC_VERSION()
-            set(CLANG_COVERAGE_ARGS "-Xclang -coverage-cfg-checksum -Xclang -coverage-no-function-names-in-data -Xclang -coverage-version='${GCC_VERSION}*' ")
+            set(CLANG_COVERAGE_ARGS " -Xclang -coverage-cfg-checksum -Xclang -coverage-no-function-names-in-data -Xclang -coverage-version='${GCC_VERSION}*'")
         ENDIF()
 
         FOREACH(T ${ENABLE_COVERAGE_REPORT_TARGETS})
-            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY COMPILE_FLAGS "-g --coverage ")
-            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY COMPILE_FLAGS " -g --coverage")
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS " -g --coverage")
             SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY COMPILE_FLAGS ${CLANG_COVERAGE_ARGS})
         ENDFOREACH()
 
         FOREACH(T ${ENABLE_COVERAGE_REPORT_TESTS})
-            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS "-g --coverage ")
+            SET_PROPERTY(TARGET ${T} APPEND_STRING PROPERTY LINK_FLAGS " -g --coverage")
         ENDFOREACH()
 
         # html report
