@@ -1,9 +1,13 @@
-cmake-extras (0.5-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (0.5+15.10.20151021-0ubuntu1) wily; urgency=medium
 
+  [ Pete Woods ]
   * Don't assume anything about the doxygen examples directory. (LP: #1476487)
   * Only build docs when input files have changed. (LP: #1476488)
 
- -- Pete Woods <pete.woods@canonical.com>  Wed, 21 Oct 2015 11:54:21 +0100
+  [ CI Train Bot ]
+  * No-change rebuild.
+
+ -- Pete Woods <ci-train-bot@canonical.com>  Wed, 21 Oct 2015 10:57:29 +0000
 
 cmake-extras (0.4+15.10.20151020-0ubuntu1) wily; urgency=medium
 
