@@ -77,10 +77,11 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 
   cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
 
-  set(DOXYFILE_INPUT "\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+  set(INPUT "\"${CMAKE_CURRENT_SOURCE_DIR}\"")
   if(_ARG_INPUT)
-    _doxygen_to_quoted_string(DOXYFILE_INPUT "${_ARG_INPUT}")
+    set(INPUT "${_ARG_INPUT}")
   endif()
+  _doxygen_to_quoted_string(DOXYFILE_INPUT "${INPUT}")
 
   set(DOXYFILE_FILE_PATTERNS "")
   if(_ARG_FILE_PATTERNS)
@@ -122,7 +123,7 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
     set(DOXYFILE_XML_OUTPUT "${_ARG_XML_OUTPUT}")
   endif()
 
-  set(DOXYFILE_EXAMPLE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+  set(DOXYFILE_EXAMPLE_PATH "")
   if(_ARG_EXAMPLE_PATH)
     set(DOXYFILE_EXAMPLE_PATH "${_ARG_EXAMPLE_PATH}")
   endif()
@@ -249,18 +250,37 @@ if(DOXYGEN_FOUND AND DOXYFILE_IN_FOUND)
 
   configure_file("${_DOXYFILE_IN}" "${_DOXYFILE}" @ONLY)
 
-  add_custom_target(
-    ${TARGET_NAME}
-    ${_ALL}
+  set(OUTPUT_FILE "${DOXYFILE_OUTPUT_DIRECTORY}/${DOXYFILE_HTML_OUTPUT}/index.html")
+
+  set(DEPENDENCIES "")
+  foreach(_DIRECTORY ${INPUT})
+    file(
+      GLOB_RECURSE _TMP
+      "${_DIRECTORY}/*"
+    )
+    list(APPEND DEPENDENCIES ${_TMP})
+  endforeach()
+
+  add_custom_command(
+    OUTPUT
+      "${OUTPUT_FILE}"
     COMMAND
       "${DOXYGEN_EXECUTABLE}"
       "${_DOXYFILE}" 
     DEPENDS
       "${_DOXYFILE}"
+      ${DEPENDENCIES}
     COMMENT
       "Writing documentation to ${DOXYFILE_OUTPUT_DIRECTORY}..."
     WORKING_DIRECTORY
       "${CMAKE_CURRENT_SOURCE_DIR}"
+  )
+
+  add_custom_target(
+    ${TARGET_NAME}
+    ${_ALL}
+    DEPENDS
+      "${OUTPUT_FILE}"
   )
 
   if(_ARG_INSTALL)
