@@ -1,3 +1,9 @@
+cmake-extras (0.5+16.04.20151026-0ubuntu1) xenial; urgency=medium
+
+  * No change rebuild for cmake 3.3
+
+ -- Pete Woods <ci-train-bot@canonical.com>  Mon, 26 Oct 2015 07:35:06 +0000
+
 cmake-extras (0.5+15.10.20151021-0ubuntu1) wily; urgency=medium
 
   [ Pete Woods ]
