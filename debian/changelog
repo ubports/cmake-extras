@@ -1,3 +1,12 @@
+cmake-extras (0.5+16.04.20160113-0ubuntu1) xenial; urgency=medium
+
+  * Add -g to compile flags for gtest/gmock, otherwise we don't
+    necessarily get debug info if a test needs debugging with gdb. Also
+    added warning suppressions to stop the noise from the build if the
+    caller has additional warnings enabled.
+
+ -- Michi Henning <michi.henning@canonical.com>  Wed, 13 Jan 2016 12:22:46 +0000
+
 cmake-extras (0.5+16.04.20151026-0ubuntu1) xenial; urgency=medium
 
   * No change rebuild for cmake 3.3
