@@ -30,6 +30,7 @@ endif()
 #     [SEARCH_PATH path]      # Path to search for resources in (defaults to ${CMAKE_CURRENT_SOURCE_DIR})
 #     [BINARY_DIR path]
 #     [DESTINATION path]
+#     [NO_INSTALL]            # Do not install this plugin during CMake install phase
 #     [TARGET_PREFIX string]  # Will be prefixed to the target name
 # )
 #
@@ -38,7 +39,8 @@ endif()
 
 function(export_qmlfiles PLUGIN PATH)
     set(single SEARCH_PATH BINARY_DIR DESTINATION TARGET_PREFIX)
-    cmake_parse_arguments(QMLFILES "" "${single}" "" ${ARGN})
+    set(options NO_INSTALL)
+    cmake_parse_arguments(QMLFILES "${options}" "${single}" "" ${ARGN})
  
     set(DEST "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
     if(QMLFILES_DESTINATION)
@@ -75,10 +77,12 @@ function(export_qmlfiles PLUGIN PATH)
                         SOURCES ${QMLFILES}
     )
 
-    # install the qmlfiles file.
-    install(FILES ${QMLFILES}
-        DESTINATION ${DEST}/${PATH}
-    )
+    if(NOT DEFINED QMLFILES_NO_INSTALL)
+        # install the qmlfiles file.
+        install(FILES ${QMLFILES}
+            DESTINATION ${DEST}/${PATH}
+        )
+    endif()
 endfunction()
 
 
@@ -94,6 +98,7 @@ endfunction()
 # export_qmlplugin(plugin version path
 #     [BINARY_DIR path]
 #     [DESTINATION path]
+#     [NO_INSTALL] # Do not install this plugin during CMake install phase
 #     [TARGET_PREFIX string]  # Will be prefixed to the target name
 #     [ENVIRONMENT string]    # Will be added to qmlplugindump's env
 #     [TARGETS target1 [target2 ...]] # Targets to depend on and install (e.g. the plugin shared object)
@@ -105,7 +110,7 @@ endfunction()
 #     It will be made a dependency of the "qmltypes" target.
 
 function(export_qmlplugin PLUGIN VERSION PATH)
-    set(options NO_TYPES)
+    set(options NO_TYPES NO_INSTALL)
     set(single BINARY_DIR DESTINATION TARGET_PREFIX ENVIRONMENT)
     set(multi TARGETS)
     cmake_parse_arguments(QMLPLUGIN "${options}" "${single}" "${multi}" ${ARGN})
@@ -149,10 +154,12 @@ function(export_qmlplugin PLUGIN VERSION PATH)
                           RUNTIME_OUTPUT_DIRECTORY ${qmlplugin_dir}
     )
 
-    # Install additional targets
-    install(TARGETS ${QMLPLUGIN_TARGETS}
-        DESTINATION ${DEST}/${PATH}
-    )
+    if(NOT DEFINED QMLFILES_NO_INSTALL)
+        # Install additional targets
+        install(TARGETS ${QMLPLUGIN_TARGETS}
+            DESTINATION ${DEST}/${PATH}
+        )
+    endif()
 endfunction()
 
 
