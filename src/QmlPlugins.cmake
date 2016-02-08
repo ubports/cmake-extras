@@ -42,10 +42,8 @@ function(export_qmlfiles PLUGIN PATH)
     set(options NO_INSTALL)
     cmake_parse_arguments(QMLFILES "${options}" "${single}" "" ${ARGN})
 
-    if(QMLFILES_DESTINATION)
-        set(DEST "${QMLFILES_DESTINATION}")
-    else()
-        set(DEST "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+    if(NOT QMLFILES_DESTINATION)
+        set(QMLFILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
     endif()
 
     if(NOT QMLFILES_SEARCH_PATH)
@@ -81,7 +79,7 @@ function(export_qmlfiles PLUGIN PATH)
     if(NOT QMLFILES_NO_INSTALL)
         # install the qmlfiles file.
         install(FILES ${QMLFILES}
-            DESTINATION ${DEST}/${PATH}
+            DESTINATION ${QMLFILES_DESTINATION}/${PATH}
         )
     endif()
 endfunction()
@@ -116,10 +114,8 @@ function(export_qmlplugin PLUGIN VERSION PATH)
     set(multi TARGETS)
     cmake_parse_arguments(QMLPLUGIN "${options}" "${single}" "${multi}" ${ARGN})
 
-    if(QMLFILES_DESTINATION)
-        set(DEST "${QMLFILES_DESTINATION}")
-    else()
-        set(DEST "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+    if(NOT QMLFILES_DESTINATION)
+        set(QMLFILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
     endif()
 
     if(QMLPLUGIN_BINARY_DIR)
@@ -159,7 +155,7 @@ function(export_qmlplugin PLUGIN VERSION PATH)
     if(NOT QMLFILES_NO_INSTALL)
         # Install additional targets
         install(TARGETS ${QMLPLUGIN_TARGETS}
-            DESTINATION ${DEST}/${PATH}
+            DESTINATION ${QMLFILES_DESTINATION}/${PATH}
         )
     endif()
 endfunction()
