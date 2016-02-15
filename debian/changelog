@@ -1,3 +1,10 @@
+cmake-extras (0.6-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Add NO_INSTALL option to QmlPlugins.cmake (LP: #1539314).
+  * Respect DESTINATION parameter in QmlPlugins.cmake (LP: #1539314).
+
+ -- Pete Woods <pete.woods@canonical.com>  Mon, 01 Feb 2016 10:05:42 +0000
+
 cmake-extras (0.5+16.04.20160113-0ubuntu1) xenial; urgency=medium
 
   * Add -g to compile flags for gtest/gmock, otherwise we don't

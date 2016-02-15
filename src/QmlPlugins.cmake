@@ -29,7 +29,8 @@ endif()
 # export_qmlfiles(plugin path
 #     [SEARCH_PATH path]      # Path to search for resources in (defaults to ${CMAKE_CURRENT_SOURCE_DIR})
 #     [BINARY_DIR path]
-#     [DESTINATION path]
+#     [DESTINATION path]      # Will install in ${CMAKE_INSTALL_LIBDIR}/qt5/qml unless overridden by this parameter
+#     [NO_INSTALL]            # Do not install this plugin during CMake install phase
 #     [TARGET_PREFIX string]  # Will be prefixed to the target name
 # )
 #
@@ -38,9 +39,12 @@ endif()
 
 function(export_qmlfiles PLUGIN PATH)
     set(single SEARCH_PATH BINARY_DIR DESTINATION TARGET_PREFIX)
-    cmake_parse_arguments(QMLFILES "" "${single}" "" ${ARGN})
- 
-    set(QMLFILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+    set(options NO_INSTALL)
+    cmake_parse_arguments(QMLFILES "${options}" "${single}" "" ${ARGN})
+
+    if(NOT QMLFILES_DESTINATION)
+        set(QMLFILES_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+    endif()
 
     if(NOT QMLFILES_SEARCH_PATH)
         set(QMLFILES_SEARCH_PATH ${CMAKE_CURRENT_SOURCE_DIR})
@@ -72,10 +76,12 @@ function(export_qmlfiles PLUGIN PATH)
                         SOURCES ${QMLFILES}
     )
 
-    # install the qmlfiles file.
-    install(FILES ${QMLFILES}
-        DESTINATION ${QMLFILES_DESTINATION}/${PATH}
-    )
+    if(NOT QMLFILES_NO_INSTALL)
+        # install the qmlfiles file.
+        install(FILES ${QMLFILES}
+            DESTINATION ${QMLFILES_DESTINATION}/${PATH}
+        )
+    endif()
 endfunction()
 
 
@@ -90,7 +96,8 @@ endfunction()
 #
 # export_qmlplugin(plugin version path
 #     [BINARY_DIR path]
-#     [DESTINATION path]
+#     [DESTINATION path] # Will install in ${CMAKE_INSTALL_LIBDIR}/qt5/qml unless overridden by this parameter
+#     [NO_INSTALL] # Do not install this plugin during CMake install phase
 #     [TARGET_PREFIX string]  # Will be prefixed to the target name
 #     [ENVIRONMENT string]    # Will be added to qmlplugindump's env
 #     [TARGETS target1 [target2 ...]] # Targets to depend on and install (e.g. the plugin shared object)
@@ -102,12 +109,14 @@ endfunction()
 #     It will be made a dependency of the "qmltypes" target.
 
 function(export_qmlplugin PLUGIN VERSION PATH)
-    set(options NO_TYPES)
+    set(options NO_TYPES NO_INSTALL)
     set(single BINARY_DIR DESTINATION TARGET_PREFIX ENVIRONMENT)
     set(multi TARGETS)
     cmake_parse_arguments(QMLPLUGIN "${options}" "${single}" "${multi}" ${ARGN})
 
-    set(QMLPLUGIN_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+    if(NOT QMLPLUGIN_DESTINATION)
+        set(QMLPLUGIN_DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt5/qml")
+    endif()
 
     if(QMLPLUGIN_BINARY_DIR)
         set(qmlplugin_dir ${QMLPLUGIN_BINARY_DIR}/${PATH})
@@ -143,10 +152,12 @@ function(export_qmlplugin PLUGIN VERSION PATH)
                           RUNTIME_OUTPUT_DIRECTORY ${qmlplugin_dir}
     )
 
-    # Install additional targets
-    install(TARGETS ${QMLPLUGIN_TARGETS}
-        DESTINATION ${QMLPLUGIN_DESTINATION}/${PATH}
-    )
+    if(NOT QMLPLUGIN_NO_INSTALL)
+        # Install additional targets
+        install(TARGETS ${QMLPLUGIN_TARGETS}
+            DESTINATION ${QMLPLUGIN_DESTINATION}/${PATH}
+        )
+    endif()
 endfunction()
 
 
