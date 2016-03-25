@@ -1,3 +1,46 @@
+# .rst:
+# FormatCode
+# ----------
+#
+# Helpers to reformat code or test that source follows the style guide.
+# Supports astyle and clang-format.
+#
+# The following public functions are provided by this module:
+#
+# ::
+#
+#   add_formatcode_target
+#     - Reformat the source code when 'make formatcode' is run
+#   add_formatcode_test
+#     - Add ctest to confirm the source code follows the style guide
+#
+# The following variables may be set before calling these functions
+# to modify the way the formatcode is run:
+#
+# ::
+#
+#   FORMATCODE_SOURCES = list of sources to reformat or test. (Required)
+#   FORMATCODE_STYLE = project name house style to look for shared style files,
+#                      eg /usr/share/cmake/Modules/formatcode/$project.astyle.
+#   FORMATCODE_ASTYLE_CONFIG = file of astyle options to use
+#   FORMATCODE_CLANG_FORMAT_CONFIG = file of clang-format options to use
+#
+# Example use:
+#
+# ::
+#
+#   In CMakeLists.txt:
+#
+#     set(FORMATCODE_STYLE unity-api)
+#     file(GLOB_RECURSE FORMATCODE_SOURCES src/*.cpp src/*.cxx src/*.cc src/*.h)
+#     include(FormatCode)
+#     add_formatcode_target()
+#
+#   In tests/CMakeLists.txt:
+#
+#     add_formatcode_test()
+#
+
 #=============================================================================
 # Copyright 2016 Canonical Ltd
 #
@@ -19,12 +62,9 @@
 set(FORMATCODE_CMAKE_MODULE_DIR ${CMAKE_CURRENT_LIST_DIR}/formatcode)
 
 # Look for which .astyle or .clang-format style files to use.
-# 1. If FORMATCODE_STYLE is set to denote a project name for a 'house style',
-#    Look for $projectname.astyle or $projectname.clang-format files
-# 2. Otherwise if FORMATCODE_ASTYLE_CONFIG or FORMATCODE_CLANG_FORMAT_CONFIG
-#    have been set by the user, use those values
-# 3. Lastly, look for a astyle-config or .clang-format file in
-#    ${CMAKE_SOURCE_DIR}
+# 1. Try the project/house style in FORMATCODE_STYLE first
+# 2. Look for FORMATCODE_ASTYLE_CONFIG or FORMATCODE_CLANG_FORMAT_CONFIG
+# 3. Lastly, look in ${CMAKE_SOURCE_DIR} for astyle-config or .clang-format
 
 message(STATUS "checking for astyle or clang-format style files")
 
@@ -67,7 +107,7 @@ endif()
 # add a 'make formatcode' target to reformat the source files
 function(add_formatcode_target)
     if(NOT FORMATCODE_SOURCES)
-        message(FATAL_ERROR "add_formatcode_target called without FORMATCODE_SOURCES set")
+        message(FATAL_ERROR "add_formatcode_target() called without FORMATCODE_SOURCES set")
     endif()
     set(TMPFILE ${CMAKE_BINARY_DIR}/formatcode_format.cmake)
     configure_file(${FORMATCODE_CMAKE_MODULE_DIR}/formatcode_format.cmake.in ${TMPFILE} @ONLY)
@@ -77,7 +117,7 @@ endfunction()
 # add a 'formatcode' test to confirm the source files follow the style guide
 function(add_formatcode_test)
     if(NOT FORMATCODE_SOURCES)
-        message(FATAL_ERROR "add_formatcode_test called without FORMATCODE_SOURCES set")
+        message(FATAL_ERROR "add_formatcode_test() called without FORMATCODE_SOURCES set")
     endif()
     set(TMPFILE ${CMAKE_BINARY_DIR}/formatcode_test.cmake)
     configure_file(${FORMATCODE_CMAKE_MODULE_DIR}/formatcode_test.cmake.in ${TMPFILE} @ONLY)
