@@ -16,77 +16,51 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #=============================================================================
 
-# check to see what formatter(s) we're using...
-
-if(EXISTS ${FORMATCODE_ASTYLE_CONFIG})
-
-    # find the astyle...
-    set(USE_ASTYLE TRUE)
-    find_program(ASTYLE NAMES astyle)
-    if(NOT ASTYLE)
-        message(WARNING "found astyle config file, but not astyle")
-    endif()
-
-    # astyle 2.03 writes DOS line endings: https://sourceforge.net/p/astyle/bugs/268/
-    find_program(DOS2UNIX NAMES dos2unix)
-    if(NOT DOS2UNIX)
-        message(WARNING "formatcode astyle needs dos2unix")
-    endif()
-
-endif()
-
-if(EXISTS ${FORMATCODE_CLANG_FORMAT_CONFIG})
-
-    # find the clang-format executable...
-    find_program(CLANG_FORMAT NAMES clang-format clang-format-3.8 clang-format-3.7 clang-format-3.6 clang-format-3.5)
-    if(NOT CLANG_FORMAT)
-        message(WARNING "found clang-format style file, but not clang-format")
-    endif()
-
-    # clang-format has a goofy wart, it doesn't let you pass in an arbitrary
-    # style file. But, you CAN pass style options on the command line with
-    # --style="{foo: bar, mum: baz}" ... so let's read the style file in
-    # and bang it into a --style string
-    file(READ ${FORMATCODE_CLANG_FORMAT_CONFIG} contents)
+# clang-format has a goofy wart, it doesn't let you pass in an arbitrary
+# style file. But, you CAN pass style options on the command line with
+# --style="{foo: bar, mum: baz}" ... so let's read the style file in
+# and bang it into a --style string
+function(_fc_get_cformat_style cformat_style_string filename)
+    file(READ ${filename} contents)
     STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
     STRING(REGEX REPLACE "\n" ";" contents "${contents}")
-    set(CLANG_FORMAT_STYLE)
+    set(style)
     foreach(LINE IN LISTS contents)
         string(STRIP "${LINE}" LINE)
         if (LINE MATCHES ".*:.*")
-            set(CLANG_FORMAT_STYLE "${CLANG_FORMAT_STYLE}${LINE}, ")
+            set(style "${style}${LINE}, ")
         endif()
     endforeach(LINE)
-    STRING(LENGTH "${CLANG_FORMAT_STYLE}" len)
+    STRING(LENGTH "${style}" len)
     if(${len} GREATER 2) # trim the trailing ", "
         MATH(EXPR len "${len}-2") 
-        STRING(SUBSTRING "${CLANG_FORMAT_STYLE}" 0 ${len} CLANG_FORMAT_STYLE)
+        STRING(SUBSTRING "${style}" 0 ${len} style)
     endif()
-    set(CLANG_FORMAT_STYLE "{${CLANG_FORMAT_STYLE}}")
-
-endif()
+    # set retval
+    set(${cformat_style_string} "{${style}}" PARENT_SCOPE)
+endfunction()
 
 # formatting funcs
 
-function(formatcode_format_file filename)
-    if(ASTYLE)
+function(formatcode_format_file astyle astyle_config dos2unix cformat cformat_style_string filename)
+    if(atyle AND astyle_config)
         set(activity TRUE)
-        execute_process(COMMAND ${ASTYLE} --quiet -n --options=${FORMATCODE_ASTYLE_CONFIG} ${filename})
-        execute_process(COMMAND ${DOS2UNIX} --quiet ${filename})
+        execute_process(COMMAND ${astyle} --quiet -n --options=${astyle_config} ${filename})
+        execute_process(COMMAND ${dos2unix} --quiet ${filename})
     endif()
-    if(CLANG_FORMAT)
+    if(cformat AND cformat_style_string)
         set(activity TRUE)
-        execute_process(COMMAND ${CLANG_FORMAT} -i -style=${CLANG_FORMAT_STYLE} ${filename})
+        execute_process(COMMAND ${cformat} -i -style=${cformat_style_string} ${filename})
     endif()
     if(NOT activity)
         message(WARNING "no formatter specified for ${filename}")
     endif()
 endfunction()
 
-function(formatcode_format_files filenames)
+function(formatcode_format_files astyle astyle_config dos2unix cformat cformat_config filenames)
+    _fc_get_cformat_style(cformat_style_string ${cformat_config})
     foreach(filename IN LISTS filenames)
-        message(STATUS "formatcode ${filename}")
-       formatcode_format_file("${filename}")
+        formatcode_format_file("${astyle}" "${astyle_config}" "${dos2unix}" "${cformat}" "${cformat_style_string}" "${filename}")
     endforeach(filename)
 endfunction()
 
@@ -94,7 +68,7 @@ endfunction()
 
 set(FORMATCODE_TEST_DIR ${CMAKE_BINARY_DIR}/formatcode)
 
-function(formatcode_test_file success filename)
+function(formatcode_test_file success astyle astyle_config dos2unix cformat cformat_style_string filename)
 
     # copy the file into a relative path underneath $build/formatcode/
     # so that, if the test fails, we can leave the formatted copy behind
@@ -108,7 +82,7 @@ function(formatcode_test_file success filename)
     file(WRITE ${tmpfile} "${input}")
 
     # format the file
-    formatcode_format_file(${tmpfile})
+    formatcode_format_file("${astyle}" "${astyle_config}" "${dos2unix}" "${cformat}" "${cformat_style_string}" ${tmpfile})
 
     # if the format changed, then $filename didn't match the style guide
     string(MD5 md5in "${input}")
@@ -123,10 +97,11 @@ function(formatcode_test_file success filename)
 
 endfunction()
 
-function(formatcode_test_files filenames)
+function(formatcode_test_files astyle astyle_config dos2unix cformat cformat_config filenames)
+    _fc_get_cformat_style(cformat_style_string ${cformat_config})
     set(error_count 0)
     foreach(filename IN LISTS filenames)
-        formatcode_test_file(success ${filename})
+        formatcode_test_file(success "${astyle}" "${astyle_config}" "${dos2unix}" "${cformat}" "${cformat_style_string}" ${filename})
         if(NOT success)
             MATH(EXPR error_count "${error_count}+1")
         endif()

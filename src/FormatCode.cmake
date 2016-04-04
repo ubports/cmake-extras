@@ -2,43 +2,46 @@
 # FormatCode
 # ----------
 #
-# Helpers to reformat code or test that source follows the style guide.
+# Helpers to reformat code or test that source follows a style guide.
 # Supports astyle and clang-format.
 #
-# The following public functions are provided by this module:
+# The ``ADD_FORMATCODE_TARGET'' function adds a rule
+# to reformat the specified sources into the desired style::
 #
-# ::
+#    add_formatcode_target(
+#        sources
+#        [STYLE_NAME <name>]
+#        [ASTYLE_CONFIG <path>]
+#        [CFORMAT_CONFIG <path>]
+#    )
 #
-#   add_formatcode_target
-#     - Reformat the source code when 'make formatcode' is run
-#   add_formatcode_test
-#     - Add ctest to confirm the source code follows the style guide
+# The ``STYLE_NAME`` option, if set, gives the name of a 'house style' shared
+# across projects and installed in ${CMAKE_CURRENT_LIST_DIR}/formatcode/ .
+# Otherwise, formatcode looks for the ``ASTYLE_CONFIG`` and ``CFORMAT_CONFIG``
+# config files in ${CMAKE_SOURCE_DIR} and ${CMAKE_SOURCE_DIR}/data/ .
 #
-# The following variables may be set before calling these functions
-# to modify the way the formatcode is run:
+# The ``ADD_FORMATCODE_TEST'' function takes the same arguments as
+# ``ADD_FORMATCODE_TARGET'' and adds a test to see if the specified
+# sources follow the desired style::
 #
-# ::
+#    add_formatcode_test(
+#        sources
+#        [STYLE_NAME <name>]
+#        [ASTYLE_CONFIG <path>]
+#        [CFORMAT_CONFIG <path>]
+#    )
 #
-#   FORMATCODE_SOURCES = list of sources to reformat or test. (Required)
-#   FORMATCODE_STYLE = project name house style to look for shared style files,
-#                      eg /usr/share/cmake/Modules/formatcode/$project.astyle.
-#   FORMATCODE_ASTYLE_CONFIG = file of astyle options to use
-#   FORMATCODE_CLANG_FORMAT_CONFIG = file of clang-format options to use
-#
-# Example use:
-#
-# ::
+#   Example use:
 #
 #   In CMakeLists.txt:
 #
-#     set(FORMATCODE_STYLE unity-api)
-#     file(GLOB_RECURSE FORMATCODE_SOURCES src/*.cpp src/*.cxx src/*.cc src/*.h)
+#     file(GLOB_RECURSE MY_SOURCES src/*.cpp src/*.cxx src/*.cc src/*.h)
 #     include(FormatCode)
-#     add_formatcode_target()
+#     add_formatcode_target(${MY_SOURCES} STYLE_NAME unity-api)
 #
 #   In tests/CMakeLists.txt:
 #
-#     add_formatcode_test()
+#     add_formatcode_test(${MY_SOURCES} STYLE_NAME unity-api)
 #
 
 #=============================================================================
@@ -59,67 +62,147 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #=============================================================================
 
-set(FORMATCODE_CMAKE_MODULE_DIR ${CMAKE_CURRENT_LIST_DIR}/formatcode)
+set(FC_CMAKE_MODULE_DIR ${CMAKE_CURRENT_LIST_DIR}/formatcode)
 
-# Look for which .astyle or .clang-format style files to use.
-# 1. Try the project/house style in FORMATCODE_STYLE first
-# 2. Look for FORMATCODE_ASTYLE_CONFIG or FORMATCODE_CLANG_FORMAT_CONFIG
-# 3. Lastly, look in ${CMAKE_SOURCE_DIR} for astyle-config or .clang-format
+function(_fc_find_style_files FC_STYLE_NAME FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
 
-message(STATUS "checking for astyle or clang-format style files")
+    message(STATUS "checking for astyle or clang-format")
 
-if(FORMATCODE_STYLE)
     set(style_search_path
-        ${FORMATCODE_CMAKE_MODULE_DIR}
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/data
+        ${FC_CMAKE_MODULE_DIR}
     )
-    set(filename ${FORMATCODE_STYLE}.astyle)
-    find_file(FORMATCODE_ASTYLE_CONFIG ${filename} PATHS ${style_search_path})
-    set(filename ${FORMATCODE_STYLE}.clang-format)
-    find_file(FORMATCODE_CLANG_FORMAT_CONFIG ${filename} PATHS ${style_search_path})
-endif()
-
-if(NOT FORMATCODE_ASTYLE_CONFIG)
-    set(fallback ${CMAKE_SOURCE_DIR}/astyle-config)
-    if(EXISTS ${fallback})
-        set(FORMATCODE_ASTYLE_CONFIG ${fallback})
+    
+    if(FC_STYLE_NAME)
+        set(filename ${FC_STYLE_NAME}.astyle)
+        find_file(astyle_tmp ${filename} PATHS ${style_search_path})
+        set(filename ${FC_STYLE_NAME}.clang-format)
+        find_file(cformat_tmp ${filename} PATHS ${style_search_path})
     endif()
-endif()
 
-if(NOT FORMATCODE_CLANG_FORMAT_CONFIG)
-    set(fallback ${CMAKE_SOURCE_DIR}/.clang-format)
-    if(EXISTS ${fallback})
-        set(FORMATCODE_CLANG_FORMAT_CONFIG ${fallback})
+    if(FC_ASTYLE_CONFIG AND NOT astyle_tmp)
+        if(EXISTS ${FC_ASTYLE_CONFIG})
+            set(astyle_tmp ${FC_ASTYLE_CONFIG})
+        else()
+            find_file(astyle_tmp
+                NAMES ${FC_ASTYLE_CONFIG} astyle-config
+                PATHS ${style_search_path}
+            )
+        endif()
     endif()
-endif()
 
-if(FORMATCODE_ASTYLE_CONFIG)
-    message(STATUS "  found ${FORMATCODE_ASTYLE_CONFIG}")
-endif()
+    if(FC_CFORMAT_CONFIG AND NOT cformat_tmp)
+        if(EXISTS ${FC_CFORMAT_CONFIG})
+            set(cformat_tmp ${FC_CFORMAT_CONFIG})
+        else()
+            find_file(cformat_tmp
+                NAMES ${FC_CFORMAT_CONFIG} cformat-config
+                PATHS ${style_search_path}
+            )
+        endif()
+    endif()
 
-if(FORMATCODE_CLANG_FORMAT_CONFIG)
-    message(STATUS "  found ${FORMATCODE_CLANG_FORMAT_CONFIG}")
-endif()
+    # set retvals
 
+    if(astyle_tmp)
+        message(STATUS "  found ${astyle_tmp}")
+        set(FC_ASTYLE_CONFIG ${astyle_tmp} PARENT_SCOPE)
+    endif()
 
+    if(cformat_tmp)
+        message(STATUS "  found ${cformat_tmp}")
+        set(FC_CFORMAT_CONFIG ${cformat_tmp} PARENT_SCOPE)
+    endif()
+
+endfunction()
+
+function(_fc_find_apps FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
+
+    if(EXISTS ${FC_ASTYLE_CONFIG})
+        # find astyle...
+        find_program(ASTYLE NAMES astyle)
+        if(NOT ASTYLE)
+            message(WARNING "found astyle config file, but not astyle")
+        endif()
+
+        # astyle 2.03 writes DOS line endings: https://sourceforge.net/p/astyle/bugs/268/
+        find_program(DOS2UNIX NAMES dos2unix)
+        if(NOT DOS2UNIX)
+            message(WARNING "formatcode astyle needs dos2unix")
+        endif()
+    endif()
+
+    if(EXISTS ${FC_CFORMAT_CONFIG})
+        # find clang-format executable...
+        find_program(CFORMAT NAMES clang-format clang-format-3.8 clang-format-3.7 clang-format-3.6 clang-format-3.5)
+        if(NOT CFORMAT)
+            message(WARNING "found clang-format style file, but not clang-format")
+        endif()
+    endif()
+
+    # set retvals
+
+    if(ASTYLE)
+        message(STATUS "  found ${ASTYLE}")
+        set(FC_ASTYLE ${ASTYLE} PARENT_SCOPE)
+    endif()
+
+    if(DOS2UNIX)
+        message(STATUS "  found ${DOS2UNIX}")
+        set(FC_DOS2UNIX ${DOS2UNIX} PARENT_SCOPE)
+    endif()
+
+    if(CFORMAT)
+        message(STATUS "  found ${CFORMAT}")
+        set(FC_CFORMAT ${CFORMAT} PARENT_SCOPE)
+    endif()
+
+endfunction()
+
+# cmake doesn't have a mktemp func, so roll a simple one
+function(_fc_mktemp in out)
+    set(_counter 1)
+    while(EXISTS ${in}.${_counter})
+        math(EXPR _counter "${_counter} + 1")
+    endwhile()
+    set(${out} "${in}.${_counter}" PARENT_SCOPE)
+endfunction()
+
+# add_custom_target() and add_test() can take a cmake file argument but not a
+# function name argument, so we generate cmake files to call
+# formatcode_format_files() or formatcode_test_files() with the right FC_* args
+function(_fc_configure_new_cmake_file filename template_name)
+
+    # parse the args
+    set(options)
+    set(oneValueArgs STYLE_NAME ASTYLE_CONFIG CFORMAT_CONFIG)
+    set(multiValueArgs)
+    cmake_parse_arguments(FC "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    set(FC_SOURCES "${FC_UNPARSED_ARGUMENTS}")
+
+    # use the args to find the right formatters and config files
+    _fc_find_style_files("${FC_STYLE_NAME}" "${FC_ASTYLE_CONFIG}" "${FC_CFORMAT_CONFIG}")
+    _fc_find_apps("${FC_ASTYLE_CONFIG}" "${FC_CFORMAT_CONFIG}")
+
+    # build the config file
+    _fc_mktemp(${CMAKE_BINARY_DIR}/${template_name} TMPFILE)
+    set(TMPFILE ${TMPFILE}.cmake)
+    configure_file(${FC_CMAKE_MODULE_DIR}/${template_name}.cmake.in ${TMPFILE} @ONLY)
+
+    # set the retval, the filename of the generated file
+    set(${filename} ${TMPFILE} PARENT_SCOPE)
+endfunction()
 
 # add a 'make formatcode' target to reformat the source files
 function(add_formatcode_target)
-    if(NOT FORMATCODE_SOURCES)
-        message(FATAL_ERROR "add_formatcode_target() called without FORMATCODE_SOURCES set")
-    endif()
-    set(TMPFILE ${CMAKE_BINARY_DIR}/formatcode_format.cmake)
-    configure_file(${FORMATCODE_CMAKE_MODULE_DIR}/formatcode_format.cmake.in ${TMPFILE} @ONLY)
-    add_custom_target(formatcode COMMAND ${CMAKE_COMMAND} -P ${TMPFILE} DEPENDS ${FORMATCODE_SOURCES})
+    _fc_configure_new_cmake_file(cmake_file "formatcode_format" ${ARGN})
+    add_custom_target(formatcode COMMAND ${CMAKE_COMMAND} -P ${cmake_file} DEPENDS ${FC_SOURCES})
 endfunction()
 
 # add a 'formatcode' test to confirm the source files follow the style guide
 function(add_formatcode_test)
-    if(NOT FORMATCODE_SOURCES)
-        message(FATAL_ERROR "add_formatcode_test() called without FORMATCODE_SOURCES set")
-    endif()
-    set(TMPFILE ${CMAKE_BINARY_DIR}/formatcode_test.cmake)
-    configure_file(${FORMATCODE_CMAKE_MODULE_DIR}/formatcode_test.cmake.in ${TMPFILE} @ONLY)
-    add_test(NAME formatcode COMMAND ${CMAKE_COMMAND} -P ${TMPFILE})
+    _fc_configure_new_cmake_file(cmake_file "formatcode_test" ${ARGN})
+    add_test(NAME formatcode COMMAND ${CMAKE_COMMAND} -P ${cmake_file})
 endfunction()
+
