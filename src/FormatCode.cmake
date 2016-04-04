@@ -2,7 +2,7 @@
 # FormatCode
 # ----------
 #
-# Helpers to reformat code or test that source follows a style guide.
+# Helpers to reformat source or test that it follows a style guide.
 # Supports astyle and clang-format.
 #
 # The ``ADD_FORMATCODE_TARGET'' function adds a rule
@@ -15,10 +15,11 @@
 #        [CFORMAT_CONFIG <path>]
 #    )
 #
-# The ``STYLE_NAME`` option, if set, gives the name of a 'house style' shared
-# across projects and installed in ${CMAKE_CURRENT_LIST_DIR}/formatcode/ .
-# Otherwise, formatcode looks for the ``ASTYLE_CONFIG`` and ``CFORMAT_CONFIG``
-# config files in ${CMAKE_SOURCE_DIR} and ${CMAKE_SOURCE_DIR}/data/ .
+# If the ``STYLE_NAME`` argument is used, formatcode first looks for shared
+# style files installed in the FormatCode module's formatcode/ directory.
+#
+# Otherwise it looks in ${CMAKE_SOURCE_DIR} and ${CMAKE_SOURCE_DIR}/data/
+# for the ``ASTYLE_CONFIG`` and ``CFORMAT_CONFIG`` files.
 #
 # The ``ADD_FORMATCODE_TEST'' function takes the same arguments as
 # ``ADD_FORMATCODE_TARGET'' and adds a test to see if the specified
@@ -108,11 +109,15 @@ function(_fc_find_style_files FC_STYLE_NAME FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
     if(astyle_tmp)
         message(STATUS "  found ${astyle_tmp}")
         set(FC_ASTYLE_CONFIG ${astyle_tmp} PARENT_SCOPE)
+    else()
+        unset(FC_ASTYLE_CONFIG PARENT_SCOPE)
     endif()
 
     if(cformat_tmp)
         message(STATUS "  found ${cformat_tmp}")
         set(FC_CFORMAT_CONFIG ${cformat_tmp} PARENT_SCOPE)
+    else()
+        unset(FC_CFORMAT_CONFIG PARENT_SCOPE)
     endif()
 
 endfunction()
@@ -146,16 +151,22 @@ function(_fc_find_apps FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
     if(ASTYLE)
         message(STATUS "  found ${ASTYLE}")
         set(FC_ASTYLE ${ASTYLE} PARENT_SCOPE)
+    else()
+        unset(FC_ASTYLE PARENT_SCOPE)
     endif()
 
     if(DOS2UNIX)
         message(STATUS "  found ${DOS2UNIX}")
         set(FC_DOS2UNIX ${DOS2UNIX} PARENT_SCOPE)
+    else()
+        unset(FC_DOS2UNIX PARENT_SCOPE)
     endif()
 
     if(CFORMAT)
         message(STATUS "  found ${CFORMAT}")
         set(FC_CFORMAT ${CFORMAT} PARENT_SCOPE)
+    else()
+        unset(FC_CFORMAT PARENT_SCOPE)
     endif()
 
 endfunction()
