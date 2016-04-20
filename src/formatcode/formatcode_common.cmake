@@ -42,11 +42,11 @@ endfunction()
 
 # formatting funcs
 
-function(formatcode_format_file astyle astyle_config dos2unix cformat cformat_style_string filename)
+function(formatcode_format_file astyle astyle_config sed cformat cformat_style_string filename)
     if(atyle AND astyle_config)
         set(activity TRUE)
         execute_process(COMMAND ${astyle} --quiet -n --options=${astyle_config} ${filename})
-        execute_process(COMMAND ${dos2unix} --quiet ${filename})
+        execute_process(COMMAND ${sed} -i "s/\r//" ${filename})
     endif()
     if(cformat AND cformat_style_string)
         set(activity TRUE)
@@ -57,10 +57,10 @@ function(formatcode_format_file astyle astyle_config dos2unix cformat cformat_st
     endif()
 endfunction()
 
-function(formatcode_format_files astyle astyle_config dos2unix cformat cformat_config filenames)
+function(formatcode_format_files astyle astyle_config sed cformat cformat_config filenames)
     _fc_get_cformat_style(cformat_style_string ${cformat_config})
     foreach(filename IN LISTS filenames)
-        formatcode_format_file("${astyle}" "${astyle_config}" "${dos2unix}" "${cformat}" "${cformat_style_string}" "${filename}")
+        formatcode_format_file("${astyle}" "${astyle_config}" "${sed}" "${cformat}" "${cformat_style_string}" "${filename}")
     endforeach(filename)
 endfunction()
 
@@ -68,7 +68,7 @@ endfunction()
 
 set(FORMATCODE_TEST_DIR ${CMAKE_BINARY_DIR}/formatcode)
 
-function(formatcode_test_file success astyle astyle_config dos2unix cformat cformat_style_string filename)
+function(formatcode_test_file success astyle astyle_config sed cformat cformat_style_string filename)
 
     # copy the file into a relative path underneath $build/formatcode/
     # so that, if the test fails, we can leave the formatted copy behind
@@ -82,7 +82,7 @@ function(formatcode_test_file success astyle astyle_config dos2unix cformat cfor
     file(WRITE ${tmpfile} "${input}")
 
     # format the file
-    formatcode_format_file("${astyle}" "${astyle_config}" "${dos2unix}" "${cformat}" "${cformat_style_string}" ${tmpfile})
+    formatcode_format_file("${astyle}" "${astyle_config}" "${sed}" "${cformat}" "${cformat_style_string}" ${tmpfile})
 
     # if the format changed, then $filename didn't match the style guide
     string(MD5 md5in "${input}")
@@ -97,11 +97,11 @@ function(formatcode_test_file success astyle astyle_config dos2unix cformat cfor
 
 endfunction()
 
-function(formatcode_test_files astyle astyle_config dos2unix cformat cformat_config filenames)
+function(formatcode_test_files astyle astyle_config sed cformat cformat_config filenames)
     _fc_get_cformat_style(cformat_style_string ${cformat_config})
     set(error_count 0)
     foreach(filename IN LISTS filenames)
-        formatcode_test_file(success "${astyle}" "${astyle_config}" "${dos2unix}" "${cformat}" "${cformat_style_string}" ${filename})
+        formatcode_test_file(success "${astyle}" "${astyle_config}" "${sed}" "${cformat}" "${cformat_style_string}" ${filename})
         if(NOT success)
             MATH(EXPR error_count "${error_count}+1")
         endif()
