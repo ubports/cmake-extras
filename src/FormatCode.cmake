@@ -63,6 +63,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #=============================================================================
 
+include(CMakeParseArguments)
+
 set(FC_CMAKE_MODULE_DIR ${CMAKE_CURRENT_LIST_DIR}/formatcode)
 
 function(_fc_find_style_files FC_STYLE_NAME FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
@@ -132,9 +134,9 @@ function(_fc_find_apps FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
         endif()
 
         # astyle 2.03 writes DOS line endings: https://sourceforge.net/p/astyle/bugs/268/
-        find_program(DOS2UNIX NAMES dos2unix)
-        if(NOT DOS2UNIX)
-            message(WARNING "formatcode astyle needs dos2unix")
+        find_program(SED NAMES sed)
+        if(NOT SED)
+            message(WARNING "formatcode astyle needs sed")
         endif()
     endif()
 
@@ -155,11 +157,11 @@ function(_fc_find_apps FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
         unset(FC_ASTYLE PARENT_SCOPE)
     endif()
 
-    if(DOS2UNIX)
-        message(STATUS "  found ${DOS2UNIX}")
-        set(FC_DOS2UNIX ${DOS2UNIX} PARENT_SCOPE)
+    if(SED)
+        message(STATUS "  found ${SED}")
+        set(FC_SED ${SED} PARENT_SCOPE)
     else()
-        unset(FC_DOS2UNIX PARENT_SCOPE)
+        unset(FC_SED PARENT_SCOPE)
     endif()
 
     if(CFORMAT)
