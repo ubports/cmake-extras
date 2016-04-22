@@ -26,19 +26,5 @@
 --convert-tabs
 --close-templates
 --max-code-length=120
+--pad-oper
 
-# --pad-oper
-#
-# Commented out for now. It changes
-#
-#     for (int i=0; i<10; ++i)
-# to
-#     for (int i = 0; i < 10; ++i)
-#
-# Unfortunately, it also messes with rvalue references:
-#
-#     ResourcePtr& operator=(ResourcePtr&& r);
-#
-# becomes:
-#
-#     ResourcePtr& operator=(ResourcePtr && r);
