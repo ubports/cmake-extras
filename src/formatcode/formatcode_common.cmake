@@ -43,7 +43,7 @@ endfunction()
 # formatting funcs
 
 function(formatcode_format_file astyle astyle_config sed cformat cformat_style_string filename)
-    if(atyle AND astyle_config)
+    if(astyle AND astyle_config)
         set(activity TRUE)
         execute_process(COMMAND ${astyle} --quiet -n --options=${astyle_config} ${filename})
         execute_process(COMMAND ${sed} -i "s/\r//" ${filename})
