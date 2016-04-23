@@ -32,8 +32,8 @@ cformat="@FC_CFORMAT@"
 cformat_style="@FC_CFORMAT_STYLE@"
 
 # if no arguments were provided, read stdin and write stdout.
-files="$0"
-[$# -eq 0 ] && {
+files="$@"
+[ $# -eq 0 ] && {
     tmpdir=`mktemp -d`
     tmp=`mktemp -p $tmpdir`
     cat >$tmp
@@ -51,7 +51,7 @@ files="$0"
 }
 
 # if no arguments were provided, read stdin and write stdout.
-[$# -eq 0] && {
+[ $# -eq 0 ] && {
     cat "$tmp"
     rm -rf $tmpdir
 }
