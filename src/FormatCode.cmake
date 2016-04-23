@@ -169,6 +169,31 @@ function(_fc_mktemp in out)
     set(${out} "${in}.${_counter}" PARENT_SCOPE)
 endfunction()
 
+# clang-format has a goofy wart, it doesn't let you pass in an arbitrary
+# style file. But, you CAN pass style options on the command line with
+# --style="{foo: bar, mum: baz}" ... so let's read the style file in
+# and bang it into a --style string
+function(_fc_get_cformat_style cformat_style_string filename)
+    file(READ ${filename} contents)
+    STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
+    STRING(REGEX REPLACE "\n" ";" contents "${contents}")
+    set(style)
+    foreach(LINE IN LISTS contents)
+        string(STRIP "${LINE}" LINE)
+        if (LINE MATCHES ".*:.*")
+            set(style "${style}${LINE}, ")
+        endif()
+    endforeach(LINE)
+    STRING(LENGTH "${style}" len)
+    if(${len} GREATER 2) # trim the trailing ", "
+        MATH(EXPR len "${len}-2")
+        STRING(SUBSTRING "${style}" 0 ${len} style)
+    endif()
+    # set retval
+    set(${cformat_style_string} "{${style}}" PARENT_SCOPE)
+endfunction()
+
+
 # add_custom_target() and add_test() can take a cmake file argument but not a
 # function name argument, so we generate cmake files to call
 # formatcode_format_files() or formatcode_test_files() with the right FC_* args
@@ -191,7 +216,8 @@ function(_fc_configure_new_cmake_file filename template_name)
     configure_file(${FC_CMAKE_MODULE_DIR}/${template_name}.cmake.in ${TMPFILE} @ONLY)
 
     # build the filter
-    configure_file(${FC_CMAKE_MODULE_DIR}/formatcode.sh.in ${CMAKE_BINARY_DIR}/formatcode.sh @ONLY)
+    _fc_get_cformat_style(FC_CFORMAT_STYLE "${FC_CFORMAT_CONFIG}")
+    configure_file(${FC_CMAKE_MODULE_DIR}/formatcode.in ${CMAKE_BINARY_DIR}/formatcode @ONLY)
 
     # set the retval, the filename of the generated file
     set(${filename} ${TMPFILE} PARENT_SCOPE)
