@@ -190,6 +190,8 @@ function(_fc_configure_new_cmake_file filename template_name)
     set(TMPFILE ${TMPFILE}.cmake)
     configure_file(${FC_CMAKE_MODULE_DIR}/${template_name}.cmake.in ${TMPFILE} @ONLY)
 
+    # build the filter
+    configure_file(${FC_CMAKE_MODULE_DIR}/formatcode.sh.in ${CMAKE_BINARY_DIR}/formatcode.sh @ONLY)
 
     # set the retval, the filename of the generated file
     set(${filename} ${TMPFILE} PARENT_SCOPE)
