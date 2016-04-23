@@ -132,12 +132,6 @@ function(_fc_find_apps FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
         if(NOT ASTYLE)
             message(WARNING "found astyle config file, but not astyle")
         endif()
-
-        # astyle 2.03 writes DOS line endings: https://sourceforge.net/p/astyle/bugs/268/
-        find_program(SED NAMES sed)
-        if(NOT SED)
-            message(WARNING "formatcode astyle needs sed")
-        endif()
     endif()
 
     if(EXISTS ${FC_CFORMAT_CONFIG})
@@ -155,13 +149,6 @@ function(_fc_find_apps FC_ASTYLE_CONFIG FC_CFORMAT_CONFIG)
         set(FC_ASTYLE ${ASTYLE} PARENT_SCOPE)
     else()
         unset(FC_ASTYLE PARENT_SCOPE)
-    endif()
-
-    if(SED)
-        message(STATUS "  found ${SED}")
-        set(FC_SED ${SED} PARENT_SCOPE)
-    else()
-        unset(FC_SED PARENT_SCOPE)
     endif()
 
     if(CFORMAT)
@@ -202,6 +189,7 @@ function(_fc_configure_new_cmake_file filename template_name)
     _fc_mktemp(${CMAKE_BINARY_DIR}/${template_name} TMPFILE)
     set(TMPFILE ${TMPFILE}.cmake)
     configure_file(${FC_CMAKE_MODULE_DIR}/${template_name}.cmake.in ${TMPFILE} @ONLY)
+
 
     # set the retval, the filename of the generated file
     set(${filename} ${TMPFILE} PARENT_SCOPE)
