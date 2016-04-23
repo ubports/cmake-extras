@@ -210,14 +210,15 @@ function(_fc_configure_new_cmake_file filename template_name)
     _fc_find_style_files("${FC_STYLE_NAME}" "${FC_ASTYLE_CONFIG}" "${FC_CFORMAT_CONFIG}")
     _fc_find_apps("${FC_ASTYLE_CONFIG}" "${FC_CFORMAT_CONFIG}")
 
+    # build the filter
+    set(FC_COMMAND ${CMAKE_BINARY_DIR}/formatcode)
+    _fc_get_cformat_style(FC_CFORMAT_STYLE "${FC_CFORMAT_CONFIG}")
+    configure_file(${FC_CMAKE_MODULE_DIR}/formatcode.in ${FC_COMMAND} @ONLY)
+
     # build the config file
     _fc_mktemp(${CMAKE_BINARY_DIR}/${template_name} TMPFILE)
     set(TMPFILE ${TMPFILE}.cmake)
     configure_file(${FC_CMAKE_MODULE_DIR}/${template_name}.cmake.in ${TMPFILE} @ONLY)
-
-    # build the filter
-    _fc_get_cformat_style(FC_CFORMAT_STYLE "${FC_CFORMAT_CONFIG}")
-    configure_file(${FC_CMAKE_MODULE_DIR}/formatcode.in ${CMAKE_BINARY_DIR}/formatcode @ONLY)
 
     # set the retval, the filename of the generated file
     set(${filename} ${TMPFILE} PARENT_SCOPE)

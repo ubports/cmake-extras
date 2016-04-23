@@ -16,60 +16,25 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #=============================================================================
 
-# clang-format has a goofy wart, it doesn't let you pass in an arbitrary
-# style file. But, you CAN pass style options on the command line with
-# --style="{foo: bar, mum: baz}" ... so let's read the style file in
-# and bang it into a --style string
-function(_fc_get_cformat_style cformat_style_string filename)
-    file(READ ${filename} contents)
-    STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
-    STRING(REGEX REPLACE "\n" ";" contents "${contents}")
-    set(style)
-    foreach(LINE IN LISTS contents)
-        string(STRIP "${LINE}" LINE)
-        if (LINE MATCHES ".*:.*")
-            set(style "${style}${LINE}, ")
-        endif()
-    endforeach(LINE)
-    STRING(LENGTH "${style}" len)
-    if(${len} GREATER 2) # trim the trailing ", "
-        MATH(EXPR len "${len}-2") 
-        STRING(SUBSTRING "${style}" 0 ${len} style)
-    endif()
-    # set retval
-    set(${cformat_style_string} "{${style}}" PARENT_SCOPE)
-endfunction()
-
 # formatting funcs
 
-function(formatcode_format_file astyle astyle_config cformat cformat_style_string filename)
-    if(astyle AND astyle_config)
-        set(activity TRUE)
-        execute_process(COMMAND ${astyle} --quiet -n --lineend=linux --options=${astyle_config} ${filename})
-    endif()
-    if(cformat AND cformat_style_string)
-        set(activity TRUE)
-        execute_process(COMMAND ${cformat} -i -style=${cformat_style_string} ${filename})
-    endif()
-    if(NOT activity)
-        message(WARNING "no formatter specified for ${filename}")
-    endif()
+function(formatcode_format_file fc_command filename)
+    execute_process(COMMAND ${fc_command} ${filename})
 endfunction()
 
-function(formatcode_format_files astyle astyle_config cformat cformat_config filenames)
-    _fc_get_cformat_style(cformat_style_string ${cformat_config})
+function(formatcode_format_files fc_command filenames)
     foreach(filename IN LISTS filenames)
-        formatcode_format_file("${astyle}" "${astyle_config}" "${cformat}" "${cformat_style_string}" "${filename}")
+        formatcode_format_file("${fc_command}" "${filename}")
     endforeach(filename)
 endfunction()
 
 # testing funcs
 
-set(FORMATCODE_TEST_DIR ${CMAKE_BINARY_DIR}/formatcode)
+set(FORMATCODE_TEST_DIR ${CMAKE_BINARY_DIR}/formatted)
 
-function(formatcode_test_file success astyle astyle_config cformat cformat_style_string filename)
+function(formatcode_test_file success fc_command filename)
 
-    # copy the file into a relative path underneath $build/formatcode/
+    # copy the file into a relative path underneath $build/formatted/
     # so that, if the test fails, we can leave the formatted copy behind
     # as a breadcrumb without clutting any other directories
     file(RELATIVE_PATH rel ${CMAKE_SOURCE_DIR} ${filename})
@@ -81,7 +46,7 @@ function(formatcode_test_file success astyle astyle_config cformat cformat_style
     file(WRITE ${tmpfile} "${input}")
 
     # format the file
-    formatcode_format_file("${astyle}" "${astyle_config}" "${cformat}" "${cformat_style_string}" ${tmpfile})
+    formatcode_format_file("${fc_command}" ${tmpfile})
 
     # if the format changed, then $filename didn't match the style guide
     string(MD5 md5in "${input}")
@@ -96,11 +61,10 @@ function(formatcode_test_file success astyle astyle_config cformat cformat_style
 
 endfunction()
 
-function(formatcode_test_files astyle astyle_config cformat cformat_config filenames)
-    _fc_get_cformat_style(cformat_style_string ${cformat_config})
+function(formatcode_test_files fc_command filenames)
     set(error_count 0)
     foreach(filename IN LISTS filenames)
-        formatcode_test_file(success "${astyle}" "${astyle_config}" "${cformat}" "${cformat_style_string}" ${filename})
+        formatcode_test_file(success "${fc_command}" "${filename}")
         if(NOT success)
             MATH(EXPR error_count "${error_count}+1")
         endif()
