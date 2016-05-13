@@ -1,3 +1,9 @@
+cmake-extras (0.6+16.04.20160215-0ubuntu2) xenial; urgency=medium
+
+  * No change rebuild for new cmake
+
+ -- Michael Terry <mterry@ubuntu.com>  Tue, 29 Mar 2016 09:47:08 -0400
+
 cmake-extras (0.6+16.04.20160215-0ubuntu1) xenial; urgency=medium
 
   [ Pete Woods ]
