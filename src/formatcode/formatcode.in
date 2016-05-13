@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Copyright (C) 2013-2016 Canonical Ltd
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Authors:
+#   Michi Henning <michi.henning@canonical.com>
+#   Charles Kerr <charles.kerr@canonical.com>
+
+# Simple script to format files with astyle, followed by clang-format (which
+# undoes some damage that's done by astyle, without wiping out astyle edits we want
+# to happen).
+#
+# usage: formatcode [FILE]...
+#
+# If no arguments are provided, we format stdin and write to stdout.
+
+astyle="@FC_ASTYLE@"
+astyle_config="@FC_ASTYLE_CONFIG@"
+cformat="@FC_CFORMAT@"
+cformat_style="@FC_CFORMAT_STYLE@"
+
+# if no arguments were provided, read stdin and write stdout.
+files="$@"
+[ $# -eq 0 ] && {
+    tmpdir=`mktemp -d`
+    tmp=`mktemp -p $tmpdir`
+    cat >$tmp
+    files="$tmp"
+}
+
+# maybe run astyle
+[ -n "$astyle" -a -n "$astyle_config" ] && {
+    "$astyle" -q --options="$astyle_config" --lineend=linux -n "$files"
+}
+
+# maybe run clang-format
+[ -n "$cformat" -a -n "$cformat_style" ] && {
+    "$cformat" -i -style="$cformat_style" "$files"
+}
+
+# if no arguments were provided, read stdin and write stdout.
+[ $# -eq 0 ] && {
+    cat "$tmp"
+    rm -rf $tmpdir
+}
+
+exit $?
+
+
