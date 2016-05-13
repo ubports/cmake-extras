@@ -1,8 +1,13 @@
-cmake-extras (0.7-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (0.7+16.04.20160513-0ubuntu1) xenial; urgency=medium
 
+  [ Pete ]
   * Add formatcode module.
 
- -- Pete <pete.woods@canonical.com>  Fri, 13 May 2016 16:25:41 +0100
+  [ Charles Kerr, Pete Woods ]
+  * Add optional `formatcode' test and rule for comparing code to, and
+    reformatting code to, a style guide standard.
+
+ -- Pete Woods <ci-train-bot@canonical.com>  Fri, 13 May 2016 15:39:57 +0000
 
 cmake-extras (0.6+16.04.20160215-0ubuntu2) xenial; urgency=medium
 
