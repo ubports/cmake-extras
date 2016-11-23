@@ -31,7 +31,7 @@
 if (EXISTS "/usr/src/googletest")
     # As of version 1.8.0
     set (GMOCK_SOURCE_DIR "/usr/src/googletest/googlemock" CACHE PATH "gmock source directory")
-    set (GMOCK_INCLUDE_DIRS "${GMOCK_SOURCE_DIR}/googlemock/include" CACHE PATH "gmock source include directory")
+    set (GMOCK_INCLUDE_DIRS "${GMOCK_SOURCE_DIR}/include" CACHE PATH "gmock source include directory")
     set (GTEST_INCLUDE_DIRS "/usr/src/googletest/googletest/include" CACHE PATH "gtest source include directory")
 else()
     set (GMOCK_SOURCE_DIR "/usr/src/gmock" CACHE PATH "gmock source directory")
