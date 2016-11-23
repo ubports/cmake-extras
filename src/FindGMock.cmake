@@ -28,15 +28,22 @@
 # NOTE: Due to the way this package finder is implemented, do not attempt
 # to find the GMock package more than once.
 
-set (GMOCK_INCLUDE_DIRS "/usr/include/gmock/include" CACHE PATH "gmock source include directory")
-set (GMOCK_SOURCE_DIR "/usr/src/gmock" CACHE PATH "gmock source directory")
-set (GTEST_INCLUDE_DIRS "${GMOCK_SOURCE_DIR}/gtest/include" CACHE PATH "gtest source include directory")
+if (EXISTS "/usr/src/googletest")
+    # As of version 1.8.0
+    set (GMOCK_SOURCE_DIR "/usr/src/googletest/googlemock" CACHE PATH "gmock source directory")
+    set (GMOCK_INCLUDE_DIRS "${GMOCK_SOURCE_DIR}/googlemock/include" CACHE PATH "gmock source include directory")
+    set (GTEST_INCLUDE_DIRS "/usr/src/googletest/googletest/include" CACHE PATH "gtest source include directory")
+else()
+    set (GMOCK_SOURCE_DIR "/usr/src/gmock" CACHE PATH "gmock source directory")
+    set (GMOCK_INCLUDE_DIRS "/usr/include/gmock/include" CACHE PATH "gmock source include directory")
+    set (GTEST_INCLUDE_DIRS "${GMOCK_SOURCE_DIR}/gtest/include" CACHE PATH "gtest source include directory")
+endif()
 
 # We add -g so we get debug info for the gtest stack frames with gdb.
 # The warnings are suppressed so we get a noise-free build for gtest and gmock if the caller
 # has these warnings enabled.
 set(old_cxx_flags ${CMAKE_CXX_FLAGS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-old-style-cast -Wno-missing-field-initializers")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wno-old-style-cast -Wno-missing-field-initializers -Wno-ctor-dtor-privacy -Wno-switch-default")
 add_subdirectory(${GMOCK_SOURCE_DIR} "${CMAKE_CURRENT_BINARY_DIR}/gmock")
 set(CMAKE_CXX_FLAGS ${old_cxx_flags})
 
