@@ -1,3 +1,31 @@
+cmake-extras (0.7+16.04.20160513-0ubuntu5) zesty; urgency=medium
+
+  [ Timo Jyrinki, Martin Pitt ]
+  * Fix versioning for upper cmake version
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 15 Nov 2016 11:04:24 +0100
+
+cmake-extras (0.7+16.04.20160513-0ubuntu4) zesty; urgency=medium
+
+  [ Martin Pitt, Gianfranco Costamagna ]
+  * Enforce a particular cmake runtime dependency, because the installed
+    files have an hardcoded version directory, so we need to no-change
+    rebuild at each new cmake release.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 14 Nov 2016 17:41:56 +0100
+
+cmake-extras (0.7+16.04.20160513-0ubuntu3) zesty; urgency=medium
+
+  * Rebuild against new cmake 3.7.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 14 Nov 2016 15:05:04 +0100
+
+cmake-extras (0.7+16.04.20160513-0ubuntu2) zesty; urgency=medium
+
+  * No change rebuild for cmake 3.6 (LP: #1635613)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 21 Oct 2016 14:22:07 +0200
+
 cmake-extras (0.7+16.04.20160513-0ubuntu1) xenial; urgency=medium
 
   [ Pete ]

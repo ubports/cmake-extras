@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Ubuntu QA Team <qa-team@ubuntu.com>
 Build-Depends: cmake,
                debhelper (>= 9),
-Standards-Version: 3.9.5
+Standards-Version: 3.9.8
 Homepage: https://launchpad.net/cmake-extras
 # if you don't have have commit access to this branch but would like to upload
 # directly to Ubuntu, don't worry: your changes will be merged back into the
@@ -14,6 +14,6 @@ Vcs-Bzr: lp:cmake-extras
 Package: cmake-extras
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, cmake (>= ${cmake:Version}), cmake (<< ${cmake:nextMajor})
 Description: Extra CMake utility modules.
  Includes coverage modules.
