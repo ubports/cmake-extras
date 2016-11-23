@@ -1,3 +1,9 @@
+cmake-extras (0.7+17.04.20161123.5-0ubuntu1) zesty; urgency=medium
+
+  * Fixes for gtest 1.8.0. (LP: #1644062) (LP: #1644062)
+
+ -- Michi Henning <michi@triodia.com>  Wed, 23 Nov 2016 06:25:33 +0000
+
 cmake-extras (0.7+16.04.20160513-0ubuntu5) zesty; urgency=medium
 
   [ Timo Jyrinki, Martin Pitt ]
