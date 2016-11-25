@@ -1,3 +1,9 @@
+cmake-extras (0.8) UNRELEASED; urgency=medium
+
+  * More appropriate fix for gtest 1.8, backward compatible with 1.7.
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 24 Nov 2016 17:10:36 +1000
+
 cmake-extras (0.7+17.04.20161123.5-0ubuntu1) zesty; urgency=medium
 
   * Fixes for gtest 1.8.0. (LP: #1644062) (LP: #1644062)
