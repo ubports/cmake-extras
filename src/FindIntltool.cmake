@@ -281,50 +281,43 @@ endfunction()
 
 function(INTLTOOL_INSTALL_TRANSLATIONS)
     set(_options ALL)
-    set(_oneValueArgs GETTEXT_PACKAGE POT_FILE)
+    set(_oneValueArgs GETTEXT_PACKAGE)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "" ${ARGN})
 
-    set(_POT_FILE "${PROJECT}.pot")
+    set(_GETTEXT_PACKAGE "${PROJECT}")
 
     if(_ARG_GETTEXT_PACKAGE)
-        set(_POT_FILE "${_ARG_GETTEXT_PACKAGE}.pot")
-    endif()
-
-    if(_ARG_OUTPUT_FILE)
-        set(_POT_FILE "${_ARG_OUTPUT_FILE}")
+      set(_GETTEXT_PACKAGE "${_ARG_GETTEXT_PACKAGE}")
     endif()
 
     file(
         GLOB _PO_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/*.po
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.po
     )
 
-    get_filename_component(_ABS_POT_FILE ${_POT_FILE} ABSOLUTE)
-
     foreach(_PO_FILE ${_PO_FILES})
-        add_custom_command(
-           OUTPUT
-             ${_PO_FILE}
-           COMMAND
-             ${GETTEXT_MSGMERGE_EXECUTABLE} --quiet --update --backup=none -s ${_PO_FILE} ${_ABS_POT_FILE}
-           DEPENDS
-             ${_ABS_POT_FILE}
+        string(REPLACE ".po" "" _LANG ${_PO_FILE})
+        if(_ARG_ALL)
+          gettext_process_po_files(
+            ${_LANG}
+            ALL
+            PO_FILES ${_PO_FILE}
+          )
+        else()
+          gettext_process_po_files(
+            ${_LANG}
+            PO_FILES ${_PO_FILE}
+          )
+        endif()
+        # Must define install ourselves as process_po_files doesn't know
+        # the gettext package, so installs en as en/LC_MESSAGES/en.mo
+        install(
+          FILES ${CMAKE_CURRENT_BINARY_DIR}/${_LANG}.gmo
+          DESTINATION ${CMAKE_INSTALL_LOCALEDIR}/${_LANG}/LC_MESSAGES/
+          RENAME ${_GETTEXT_PACKAGE}.mo
         )
     endforeach()
-
-    if(_ARG_ALL)
-        gettext_create_translations(
-          ${_ABS_POT_FILE}
-          ALL
-          ${_PO_FILES}
-        )
-    else()
-        gettext_create_translations(
-          ${_ABS_POT_FILE}
-          ${_PO_FILES}
-        )
-    endif()
 endfunction()
 
 function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
