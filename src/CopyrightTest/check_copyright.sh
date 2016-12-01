@@ -27,9 +27,11 @@ set -e
 
 prog_name=$(basename "$0")
 
-usage="usage: $prog_name [-d ignore_dir] [-i ignore_pattern] dir testname"
+usage="usage: $prog_name [-c include_pattern] [-i ignore_pattern] [-d ignore_dir] source_dir test_name"
 
-while getopts "hd:i:" opt
+echo "args: $*"
+echo "#: $#"
+while getopts "hc:i:d:" opt
 do
     case "$opt" in
     '?')
@@ -40,11 +42,14 @@ do
         echo $usage
         exit 0
         ;;
-    'd')
-        ignore_dir="$OPTARG"
+    'c')
+        include_pat="$OPTARG"
         ;;
     'i')
         ignore_pat="$OPTARG"
+        ;;
+    'd')
+        ignore_dir="$OPTARG"
         ;;
     esac
 done
@@ -63,6 +68,7 @@ logfile="${testname}.log"
 filteredfile="${testname}_filtered.log"
 
 args="-r $1"
+[ -n "$include_pat" ] && args="-c $include_pat $args"
 [ -n "$ignore_pat" ] && args="-i $ignore_pat $args"
 licensecheck $args > $logfile
 

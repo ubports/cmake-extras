@@ -23,12 +23,12 @@
 # 
 # add_copyright_test(
 #     SOURCE_DIR ${CMAKE_SOURCE_DIR}
-#     IGNORE_DIR ${CMAKE_BINARY_DIR}
 #     IGNORE_PATTERN \\/\\.bzr\\/|\\.sci$|debian|HACKING|README|\\.txt$|\\.in$|\\.pm$
+#     IGNORE_DIR ${CMAKE_BINARY_DIR}
 # )
 # 
-# This adds a test called "copyright" that scans all files in the source directory. Any files in the build
-# directory are ignored. In addition, complaints about missing/incorrect copyright headers in files that
+# This adds a test called "copyright" that scans files in the source directory. Any files in the build
+# directory are ignored. In addition, complaints about missing copyright headers in files that
 # match IGNORE_PATTERN are ignored as well.
 # 
 # Parameters:
@@ -36,17 +36,25 @@
 # - SOURCE_DIR (mandatory)
 #   The source directory to recursively scan for files to check.
 # 
-# - IGNORE_DIR (optional)
-#   Ignore complaints about files in this subtree.
-# 
+# - INCLUDE_PATTERN
+#   Changes the default set of common source files scanned by licensecheck to files matching the
+#   specified pattern. (This parameter is passed to the -c option of licensecheck.)
+#
 # - IGNORE_PATTERN (optional)
-#   Ignore complaints about files with names matching the pattern. Not that the full path name is used for
-#   the pattern match. To make sure that you do not accidentally match a path component in the middle of
-#   a path, anchor the pattern appropriately. Any regex meta-characters that you want to match literally
-#   must be escaped with a double backslash.
+#   Ignore complaints about files with names matching the pattern. (This parameter is passed to
+#   the -i option of licensecheck.)
+# 
+# - IGNORE_DIR (optional)
+#   Ignore complaints about files in this subtree. This parameter is used to post-filter
+#   the list of missing copyright messages from licensecheck: any reports about files without
+#   a copyright header in this subtree are ignored.
 # 
 # - TEST_NAME (optional)
 #   Sets the name of the test to be added. The default is "copyright".
+#
+#   Note that patterns match against the full path name of files. To make sure that you do not
+#   accidentally match a path component in the middle of a path, anchor the pattern appropriately.
+#   Any regex meta-characters that you want to match literally must be escaped with a double backslash.
 # 
 # The generated test uses licensecheck to probe for copyright headers. The output from the command
 # is kept in a file <TEST_NAME>.log. Complaints about files that were not ignored are stored in
@@ -64,15 +72,15 @@
 # 
 # add_copyright_test(
 #     SOURCE_DIR some_dir
+#     IGNORE_PATTERN \\.in$
 #     IGNORE_DIR some_build_dir
-#     IGNORE_PATTERN \\.txt$
 #     TEST_NAME test_1
 # )
 # 
 # add_copyright_test(
 #     SOURCE_DIR other_dir
-#     IGNORE_DIR some_build_dir
-#     IGNORE_PATTERN \\.in$
+#     INCLUDE_PATTERN \\.cpp$|\\.h$
+#     IGNORE_DIR other_build_dir
 #     TEST_NAME test_2
 # )
 #
@@ -88,27 +96,33 @@ endif()
 set(ADD_COPYRIGHT_TEST_TEST_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/check_copyright.sh")
 
 function(ADD_COPYRIGHT_TEST)
-    set(one_value_args SOURCE_DIR IGNORE_DIR IGNORE_PATTERN TEST_NAME)
+    set(one_value_args SOURCE_DIR INCLUDE_PATTERN IGNORE_DIR IGNORE_PATTERN TEST_NAME)
     cmake_parse_arguments(ADD_COPYRIGHT_TEST "" "${one_value_args}" "" ${ARGN})
 
     if("${ADD_COPYRIGHT_TEST_TEST_NAME}" STREQUAL "")
         set(ADD_COPYRIGHT_TEST_TEST_NAME "copyright")
     endif()
 
-    if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_DIR}" STREQUAL "")
-        set(ignore_dir_opt -d ${ADD_COPYRIGHT_TEST_IGNORE_DIR})
+    if(NOT "${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN}" STREQUAL "")
+        set(include_pat_opt ${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN})
     endif()
 
     if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_PATTERN}" STREQUAL "")
-        set(ignore_pat_opt -i ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN})
+        set(ignore_pat_opt ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN})
     endif()
 
+    if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_DIR}" STREQUAL "")
+        set(ignore_dir_opt ${ADD_COPYRIGHT_TEST_IGNORE_DIR})
+    endif()
+
+
+    set(opts -c ${include_pat_opt} -i ${ignore_pat_opt} -d ${ignore_dir_opt})
     add_custom_command(
         OUTPUT run_always_${ADD_COPYRIGHT_TEST_TEST_NAME}
                ${ADD_COPYRIGHT_TEST_TEST_NAME}.log
                ${ADD_COPYRIGHT_TEST_TEST_NAME}_filtered.log
-        COMMAND ${ADD_COPYRIGHT_TEST_TEST_SCRIPT}
-                    ${ignore_dir_opt} ${ignore_pat_opt} ${ADD_COPYRIGHT_TEST_SOURCE_DIR} ${ADD_COPYRIGHT_TEST_TEST_NAME}
+        COMMAND ${ADD_COPYRIGHT_TEST_TEST_SCRIPT} ${opts}
+                    ${ADD_COPYRIGHT_TEST_SOURCE_DIR} ${ADD_COPYRIGHT_TEST_TEST_NAME}
         VERBATIM
     )
     set_source_files_properties(run_always_${ADD_COPYRIGHT_TEST_TEST_NAME} PROPERTIES SYMBOLIC true)
