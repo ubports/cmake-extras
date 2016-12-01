@@ -10,7 +10,6 @@ set -ep
 
 builddir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
 trap "rm -rf $builddir" 0 INT QUIT ABRT PIPE TERM
-builddir=/tmp/build
 
 srcdir="`pwd`/examples/copyrighttest-demo"
 
