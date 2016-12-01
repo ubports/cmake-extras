@@ -3,9 +3,6 @@ Upstream-Name: cmake-extras
 Source: https://launchpad.net/cmake-extras
 
 Files: *
- modules/UseXGettext.cmake
- modules/UseDoxygen.cmake
- modules/UseDoxygen.Doxyfile.in
 Copyright: Canonical Ltd.
 License: LGPL-3
 
