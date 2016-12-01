@@ -29,8 +29,6 @@ prog_name=$(basename "$0")
 
 usage="usage: $prog_name [-c include_pattern] [-i ignore_pattern] [-d ignore_dir] source_dir test_name"
 
-echo "args: $*"
-echo "#: $#"
 while getopts "hc:i:d:" opt
 do
     case "$opt" in

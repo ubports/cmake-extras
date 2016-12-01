@@ -1,7 +1,8 @@
-Tests: findgmock
+Tests: findgmock copyrighttest
 Restrictions: allow-stderr
 Depends:
   build-essential,
   cmake,
   cmake-extras,
   googletest (>= 1.8.0) | google-mock,
+  licensecheck | devscripts (<< 2.16.6)

@@ -96,7 +96,7 @@ endif()
 set(ADD_COPYRIGHT_TEST_TEST_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/check_copyright.sh")
 
 function(ADD_COPYRIGHT_TEST)
-    set(one_value_args SOURCE_DIR INCLUDE_PATTERN IGNORE_DIR IGNORE_PATTERN TEST_NAME)
+    set(one_value_args SOURCE_DIR INCLUDE_PATTERN IGNORE_PATTERN IGNORE_DIR TEST_NAME)
     cmake_parse_arguments(ADD_COPYRIGHT_TEST "" "${one_value_args}" "" ${ARGN})
 
     if("${ADD_COPYRIGHT_TEST_TEST_NAME}" STREQUAL "")
@@ -104,19 +104,17 @@ function(ADD_COPYRIGHT_TEST)
     endif()
 
     if(NOT "${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN}" STREQUAL "")
-        set(include_pat_opt ${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN})
+        set(opts ${opts} -c ${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN})
     endif()
 
     if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_PATTERN}" STREQUAL "")
-        set(ignore_pat_opt ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN})
+        set(opts ${opts} -i ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN})
     endif()
 
     if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_DIR}" STREQUAL "")
-        set(ignore_dir_opt ${ADD_COPYRIGHT_TEST_IGNORE_DIR})
+        set(opts ${opts} -d ${ADD_COPYRIGHT_TEST_IGNORE_DIR})
     endif()
 
-
-    set(opts -c ${include_pat_opt} -i ${ignore_pat_opt} -d ${ignore_dir_opt})
     add_custom_command(
         OUTPUT run_always_${ADD_COPYRIGHT_TEST_TEST_NAME}
                ${ADD_COPYRIGHT_TEST_TEST_NAME}.log
