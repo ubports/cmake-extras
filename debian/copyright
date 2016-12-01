@@ -2,17 +2,17 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: cmake-extras
 Source: https://launchpad.net/cmake-extras
 
-Files: src/gcovr/gcovrConfig.cmake
- src/Lcov/LcovConfig.cmake
- modules/EnableCoverageReport.cmake
-Copyright: 2010 Johannes Wienke <jwienke@techfak.uni-bielefeld.de>
-License: LGPL-3
-
-Files: src/*/*
+Files: *
  modules/UseXGettext.cmake
  modules/UseDoxygen.cmake
  modules/UseDoxygen.Doxyfile.in
 Copyright: Canonical Ltd.
+License: LGPL-3
+
+Files: src/gcovr/gcovrConfig.cmake
+ src/Lcov/LcovConfig.cmake
+ modules/EnableCoverageReport.cmake
+Copyright: 2010 Johannes Wienke <jwienke@techfak.uni-bielefeld.de>
 License: LGPL-3
 
 License: LGPL-3
