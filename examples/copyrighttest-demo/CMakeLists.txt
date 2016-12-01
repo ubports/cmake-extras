@@ -29,6 +29,12 @@ add_copyright_test(
 
 add_copyright_test(
     SOURCE_DIR ${CMAKE_SOURCE_DIR}
+    IGNORE_PATTERN *\\.h|*\\.cpp$
+    TEST_NAME must_fail_4
+)
+
+add_copyright_test(
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}
     IGNORE_DIR ${CMAKE_BINARY_DIR}
     IGNORE_PATTERN no_copyright
     TEST_NAME must_succeed_1

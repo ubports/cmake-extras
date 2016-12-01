@@ -19,6 +19,7 @@ cmake $srcdir
 ! ctest -R must_fail_1 must_fail_1_test
 ! ctest -R must_fail_2
 ! ctest -R must_fail_3
+! ctest -R must_fail_4
 ctest -R must_succeed_1
 ctest -R must_succeed_2
 ctest -R must_succeed_3
