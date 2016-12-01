@@ -1,8 +1,20 @@
+cmake_minimum_required(VERSION 3.0.2)
 project(cmake-extras)
-cmake_minimum_required(VERSION 2.8.9)
 
+include(GNUInstallDirs)
+
+# Modules using the newer find_package() "config" extension mechanism.
 install(
   DIRECTORY "src/"
+  DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/"
+  USE_SOURCE_PERMISSIONS
+)
+
+# Modules installed directly to CMAKE_ROOT
+# TODO: migrate these to the above tree, since installing to
+#       CMAKE_ROOT is frowned upon.
+install(
+  DIRECTORY "modules/"
   DESTINATION "${CMAKE_ROOT}/Modules/"
-  USE_SOURCE_PERMISSIONS 
+  USE_SOURCE_PERMISSIONS
 )
