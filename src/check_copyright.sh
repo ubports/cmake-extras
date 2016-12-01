@@ -25,8 +25,6 @@
 
 set -e
 
-echo "args:" "$@"
-echo $#
 prog_name=$(basename "$0")
 
 usage="usage: $prog_name [-d ignore_dir] [-i ignore_pattern] dir testname"

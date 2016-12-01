@@ -30,8 +30,17 @@ function(ADD_COPYRIGHT_TEST)
         set(ignore_pat_opt -i ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN})
     endif()
 
-    add_test(${ADD_COPYRIGHT_TEST_TEST_NAME}
-        /usr/share/cmake/CopyrightTest/check_copyright.sh
-            ${ignore_dir_opt} ${ignore_pat_opt} ${ADD_COPYRIGHT_TEST_SOURCE_DIR} ${ADD_COPYRIGHT_TEST_TEST_NAME}
+    add_custom_command(
+        OUTPUT run_always_${ADD_COPYRIGHT_TEST_TEST_NAME}
+               ${ADD_COPYRIGHT_TEST_TEST_NAME}.log
+               ${ADD_COPYRIGHT_TEST_TEST_NAME}_filtered.log
+        COMMAND /usr/share/cmake/CopyrightTest/check_copyright.sh
+                    ${ignore_dir_opt} ${ignore_pat_opt} ${ADD_COPYRIGHT_TEST_SOURCE_DIR} ${ADD_COPYRIGHT_TEST_TEST_NAME}
+        VERBATIM
     )
+    set_source_files_properties(run_always_${ADD_COPYRIGHT_TEST_TEST_NAME} PROPERTIES SYMBOLIC true)
+
+    add_custom_target(${ADD_COPYRIGHT_TEST_TEST_NAME}_test DEPENDS run_always_${ADD_COPYRIGHT_TEST_TEST_NAME})
+
+    add_test(${ADD_COPYRIGHT_TEST_TEST_NAME} ${CMAKE_MAKE_PROGRAM} ${ADD_COPYRIGHT_TEST_TEST_NAME}_test)
 endfunction()
