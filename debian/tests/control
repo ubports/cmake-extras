@@ -1,0 +1,7 @@
+Tests: findgmock
+Restrictions: allow-stderr
+Depends:
+  build-essential,
+  cmake,
+  cmake-extras,
+  googletest (>= 1.8.0) | google-mock,

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# autopkgtest check: Build a trivial project that uses the
+# find_package(GMock) macro, and verify that the resulting test binary
+# behaves as expected.
+# (C) 2016 Canonical Ltd.
+# Author: James Henstridge <james.henstridge@canonical.com>
+
+set -ep
+
+builddir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
+trap "rm -rf $builddir" 0 INT QUIT ABRT PIPE TERM
+
+srcdir="`pwd`/examples/findgmock-demo"
+
+cd $builddir
+cmake $srcdir
+make
+[ -x test-suite ]
+./test-suite --gtest_filter="Suite.Success"
+! ./test-suite --gtest_filter="Suite.Failure"
+
