@@ -77,6 +77,16 @@
 # )
 #
 
+find_program(LICENSECHECK licensecheck)
+if(${LICENSECHECK} STREQUAL "LICENSECHECK-NOTFOUND")
+    message(SEND_ERROR "Cannot find licensecheck program, which is needed by CopyrightTest."
+                       " Run \"sudo apt-get install licensecheck\" (zesty and later)"
+                       " or \"sudo apt-get install devscripts\" (yakkety and earlier) to install it.")
+    set(CopyrightTest_FOUND false)
+endif()
+
+set(ADD_COPYRIGHT_TEST_TEST_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/check_copyright.sh")
+
 function(ADD_COPYRIGHT_TEST)
     set(one_value_args SOURCE_DIR IGNORE_DIR IGNORE_PATTERN TEST_NAME)
     cmake_parse_arguments(ADD_COPYRIGHT_TEST "" "${one_value_args}" "" ${ARGN})
@@ -97,7 +107,7 @@ function(ADD_COPYRIGHT_TEST)
         OUTPUT run_always_${ADD_COPYRIGHT_TEST_TEST_NAME}
                ${ADD_COPYRIGHT_TEST_TEST_NAME}.log
                ${ADD_COPYRIGHT_TEST_TEST_NAME}_filtered.log
-        COMMAND /usr/share/cmake/CopyrightTest/check_copyright.sh
+        COMMAND ${ADD_COPYRIGHT_TEST_TEST_SCRIPT}
                     ${ignore_dir_opt} ${ignore_pat_opt} ${ADD_COPYRIGHT_TEST_SOURCE_DIR} ${ADD_COPYRIGHT_TEST_TEST_NAME}
         VERBATIM
     )

@@ -17,6 +17,5 @@ Multi-Arch: foreign
 Depends: ${misc:Depends},
          cmake (>= ${cmake:Version}),
          cmake (<< ${cmake:nextMajor}),
-         licensecheck | devscripts (<< 2.16.6),
 Description: Extra CMake utility modules.
  Modules for coverage testing, building gtest, generating doxygen documentation, and more.

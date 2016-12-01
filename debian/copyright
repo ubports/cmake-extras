@@ -8,11 +8,7 @@ Files: src/gcovr/gcovrConfig.cmake
 Copyright: 2010 Johannes Wienke <jwienke@techfak.uni-bielefeld.de>
 License: LGPL-3
 
-Files: src/GMock/GMockConfig.cmake
- src/CopyrightTest/check_copyright.sh
- src/CopyrightTest/CopyrightTest.cmake
- src/Intltool/Intltool.cmake
- src/XGettext/XGettext.cmake
+Files: src/*/*
  modules/UseXGettext.cmake
  modules/UseDoxygen.cmake
  modules/UseDoxygen.Doxyfile.in
