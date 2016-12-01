@@ -18,4 +18,4 @@ Depends: ${misc:Depends},
          cmake (>= ${cmake:Version}),
          cmake (<< ${cmake:nextMajor}),
 Description: Extra CMake utility modules.
- Modules for coverage testing, building gtest, generating doxygen documentation, and more.
+ Modules for coverage testing, building gtest, doxygen documentation, and more.
