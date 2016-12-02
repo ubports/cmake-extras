@@ -23,7 +23,7 @@
 # 
 # add_copyright_test(
 #     SOURCE_DIR ${CMAKE_SOURCE_DIR}
-#     IGNORE_PATTERN \\/\\.bzr\\/|\\.sci$|debian|HACKING|README|\\.txt$|\\.in$|\\.pm$
+#     IGNORE_PATTERN "\\/\\.bzr\\/|\\.sci$|debian|HACKING|README|\\.txt$|\\.in$|\\.pm$"
 #     IGNORE_DIR ${CMAKE_BINARY_DIR}
 # )
 # 
@@ -72,7 +72,7 @@
 # 
 # add_copyright_test(
 #     SOURCE_DIR some_dir
-#     IGNORE_PATTERN \\.in$
+#     IGNORE_PATTERN "\\.in$"
 #     IGNORE_DIR some_build_dir
 #     TEST_NAME test_1
 # )
@@ -103,15 +103,15 @@ function(ADD_COPYRIGHT_TEST)
         set(ADD_COPYRIGHT_TEST_TEST_NAME "copyright")
     endif()
 
-    if(NOT "${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN}" STREQUAL "")
+    if(NOT ${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN} STREQUAL "")
         set(opts ${opts} -c ${ADD_COPYRIGHT_TEST_INCLUDE_PATTERN})
     endif()
 
-    if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_PATTERN}" STREQUAL "")
+    if(NOT ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN} STREQUAL "")
         set(opts ${opts} -i ${ADD_COPYRIGHT_TEST_IGNORE_PATTERN})
     endif()
 
-    if(NOT "${ADD_COPYRIGHT_TEST_IGNORE_DIR}" STREQUAL "")
+    if(NOT ${ADD_COPYRIGHT_TEST_IGNORE_DIR} STREQUAL "")
         set(opts ${opts} -d ${ADD_COPYRIGHT_TEST_IGNORE_DIR})
     endif()
 
