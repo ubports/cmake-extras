@@ -1,8 +1,18 @@
-cmake-extras (0.9) UNRELEASED; urgency=medium
+cmake-extras (0.9+17.04.20161202.1-0ubuntu1) zesty; urgency=medium
 
+  [ Michi Henning ]
   * Added CopyrightTest module.
 
- -- Michi Henning <michi.henning@canonical.com>  Thu, 01 Dec 2016 12:22:11 +1000
+  [ James Henstridge ]
+  * Add an autopkgtest for the find_package(GMock) macro.
+  * Move some of the modules out of ${CMAKE_ROOT} and in to the
+    unversioned /usr/share/cmake/ directory.
+
+  [ Rodney Dawes ]
+  * Simplify the INSTALL_TRANSLATIONS command to avoid regenerating po
+    files. (LP: #1645856)
+
+ -- Michi Henning <michi@triodia.com>  Fri, 02 Dec 2016 05:59:21 +0000
 
 cmake-extras (0.8+17.04.20161125-0ubuntu1) zesty; urgency=medium
 
