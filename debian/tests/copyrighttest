@@ -6,13 +6,12 @@
 # (C) 2016 Canonical Ltd.
 # Author: James Henstridge <james.henstridge@canonical.com>
 
-set -p
+set -ep
 
 builddir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
 trap "rm -rf $builddir" 0 INT QUIT ABRT PIPE TERM
 
 srcdir="`pwd`/examples/copyrighttest-demo"
-ctestlog=Testing/Temporary/LastTest.log
 
 cd $builddir
 cmake $srcdir
@@ -26,42 +25,37 @@ cmake $srcdir
 set -x
 status=0
 
-! ctest -R must_fail_1 || {
+! ctest -V -R must_fail_1 || {
     cat must_fail_1.log
     status=1
 }
-# ! ctest -R must_fail_2 || {
+# ! ctest -V -R must_fail_2 || {
 #     cat must_fail_2.log
 #     status=1
 # }
-# ! ctest -R must_fail_3 || {
+# ! ctest -V -R must_fail_3 || {
 #     cat must_fail_3.log
 #     status=1
 # }
-! ctest -R must_fail_4 || {
+! ctest -V -R must_fail_4 || {
     cat must_fail_4.log
     status=1
 }
 
-ctest -R must_succeed_1 || {
-    cat $ctestlog
+ctest -V -R must_succeed_1 || {
     cat must_succeed_1.log
     cat must_succeed_1_filtered.log
     status=1
 }
-# ctest -R must_succeed_2 || {
-#     cat $ctestlog
+# ctest -V -R must_succeed_2 || {
 #     cat must_succeed_2.log
 #     cat must_succeed_2_filtered.log
 #     status=1
 # }
-ctest -R must_succeed_3 || {
-    cat $ctestlog
+ctest -V -R must_succeed_3 || {
     cat must_succeed_3.log
     cat must_succeed_3_filtered.log
     status=1
 }
-
-cat $builddir/Testing/Temporary/LastTest.log
 
 exit $status
