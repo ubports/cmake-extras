@@ -1,3 +1,9 @@
+cmake-extras (0.9) UNRELEASED; urgency=medium
+
+  * Added CopyrightTest module.
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 01 Dec 2016 12:22:11 +1000
+
 cmake-extras (0.8+17.04.20161125-0ubuntu1) zesty; urgency=medium
 
   * More appropriate fix for gtest 1.8, backward compatible with 1.7.

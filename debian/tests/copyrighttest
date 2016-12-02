@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# autopkgtest check: Build a trivial project that uses the
+# find_package(CoprightTest) macro, and verify that the resulting test binary
+# behaves as expected.
+# (C) 2016 Canonical Ltd.
+# Author: James Henstridge <james.henstridge@canonical.com>
+
+set -ep
+
+builddir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
+trap "rm -rf $builddir" 0 INT QUIT ABRT PIPE TERM
+
+srcdir="`pwd`/examples/copyrighttest-demo"
+
+cd $builddir
+cmake $srcdir
+
+# We turn on tracing so we can see what's going on in more detail.
+# If a test fails, we dump the relevant logs, otherwise we have
+# no idea what happened when something goes wrong.
+
+# HACK: Some tests disabled because of https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=842368
+
+set -x
+status=0
+
+! ctest -V -R must_fail_1 || {
+    cat must_fail_1.log
+    status=1
+}
+# ! ctest -V -R must_fail_2 || {
+#     cat must_fail_2.log
+#     status=1
+# }
+# ! ctest -V -R must_fail_3 || {
+#     cat must_fail_3.log
+#     status=1
+# }
+! ctest -V -R must_fail_4 || {
+    cat must_fail_4.log
+    status=1
+}
+
+ctest -V -R must_succeed_1 || {
+    cat must_succeed_1.log
+    cat must_succeed_1_filtered.log
+    status=1
+}
+# ctest -V -R must_succeed_2 || {
+#     cat must_succeed_2.log
+#     cat must_succeed_2_filtered.log
+#     status=1
+# }
+ctest -V -R must_succeed_3 || {
+    cat must_succeed_3.log
+    cat must_succeed_3_filtered.log
+    status=1
+}
+
+exit $status

@@ -14,6 +14,8 @@ Vcs-Bzr: lp:cmake-extras
 Package: cmake-extras
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, cmake (>= ${cmake:Version}), cmake (<< ${cmake:nextMajor})
+Depends: ${misc:Depends},
+         cmake (>= ${cmake:Version}),
+         cmake (<< ${cmake:nextMajor}),
 Description: Extra CMake utility modules.
- Includes coverage modules.
+ Modules for coverage testing, building gtest, doxygen documentation, and more.
