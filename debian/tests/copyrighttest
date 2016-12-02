@@ -24,26 +24,44 @@ cmake $srcdir
 # HACK: Some tests disabled because of https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=842368
 
 set -x
+status=0
 
-! ctest -R must_fail_1 || cat must_fail_1.log
-# ! ctest -R must_fail_2 || cat must_fail_2.log
-# ! ctest -R must_fail_3 || cat must_fail_3.log
-! ctest -R must_fail_4 || cat must_fail_4.log
+! ctest -R must_fail_1 || {
+    cat must_fail_1.log
+    status=1
+}
+# ! ctest -R must_fail_2 || {
+#     cat must_fail_2.log
+#     status=1
+# }
+# ! ctest -R must_fail_3 || {
+#     cat must_fail_3.log
+#     status=1
+# }
+! ctest -R must_fail_4 || {
+    cat must_fail_4.log
+    status=1
+}
 
 ctest -R must_succeed_1 || {
     cat $ctestlog
     cat must_succeed_1.log
     cat must_succeed_1_filtered.log
+    status=1
 }
 # ctest -R must_succeed_2 || {
-#    cat $ctestlog
-#    cat must_succeed_2.log
-#    cat must_succeed_2_filtered.log
+#     cat $ctestlog
+#     cat must_succeed_2.log
+#     cat must_succeed_2_filtered.log
+#     status=1
 # }
 ctest -R must_succeed_3 || {
     cat $ctestlog
     cat must_succeed_3.log
     cat must_succeed_3_filtered.log
+    status=1
 }
 
 cat $builddir/Testing/Temporary/LastTest.log
+
+exit $status
