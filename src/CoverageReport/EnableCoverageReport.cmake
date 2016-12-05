@@ -36,10 +36,7 @@
 #   CoR-Lab, Research Institute for Cognition and Robotics
 #     Bielefeld University
 
-FIND_PACKAGE(Lcov)
-FIND_PACKAGE(gcovr)
-
-FUNCTION(SET_GCC_VERSION)
+FUNCTION(_CoverageReport_SET_GCC_VERSION)
     EXECUTE_PROCESS(COMMAND gcc -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     STRING(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONENTS ${GCC_VERSION})
     LIST(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
@@ -62,16 +59,12 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
     SET(COVERAGE_XML_FILE "${CMAKE_BINARY_DIR}/coverage.xml")
     
     # decide if there is any tool to create coverage data
-    SET(TOOL_FOUND FALSE)
-    IF(LCOV_FOUND OR GCOVR_FOUND)
-        SET(TOOL_FOUND TRUE)
-    ENDIF()
-    IF(NOT TOOL_FOUND)
+    IF(NOT CoverageReport_FOUND)
         MESSAGE(STATUS "Cannot enable coverage targets because neither lcov nor gcovr are found.")
     ENDIF()
     
     STRING(TOLOWER "${CMAKE_BUILD_TYPE}" LOWER_CMAKE_BUILD_TYPE)
-    IF(TOOL_FOUND AND "${LOWER_CMAKE_BUILD_TYPE}" STREQUAL "coverage")
+    IF(CoverageReport_FOUND AND "${LOWER_CMAKE_BUILD_TYPE}" STREQUAL "coverage")
     
         MESSAGE(STATUS "Coverage support enabled for targets: ${ENABLE_COVERAGE_REPORT_TARGETS}")
     
@@ -84,7 +77,7 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
 
         # If we are using Clang, tell it to generate coverage data suitable for gcovr.
         IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-            SET_GCC_VERSION()
+            _CoverageReport_SET_GCC_VERSION()
             set(CLANG_COVERAGE_ARGS " -Xclang -coverage-cfg-checksum -Xclang -coverage-no-function-names-in-data -Xclang -coverage-version='${GCC_VERSION}*'")
         ENDIF()
 
