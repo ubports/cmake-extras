@@ -1,2 +1,2 @@
-message(DEPRECATION "inclde(EnableCoverageReport.cmake) is deprecated.  Use find_package(CoverageReport)")
+message(DEPRECATION "inclde(EnableCoverageReport) is deprecated.  Use find_package(CoverageReport) instead")
 find_package(CoverageReport)
