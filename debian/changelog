@@ -1,8 +1,13 @@
-cmake-extras (0.10-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (0.10+17.04.20161208.1-0ubuntu1) zesty; urgency=medium
 
+  [ Pete ]
   * Migrate all modules to unversioned cmake directory.
 
- -- Pete <pete.woods@canonical.com>  Wed, 07 Dec 2016 15:01:15 +0000
+  [ James Henstridge ]
+  * Move coverage report code to use find_package(CoverageReport) rather
+    than include(EnableCoverageReport).
+
+ -- Pete Woods <pete.woods@canonical.com>  Thu, 08 Dec 2016 13:54:16 +0000
 
 cmake-extras (0.9+17.04.20161202.1-0ubuntu1) zesty; urgency=medium
 
