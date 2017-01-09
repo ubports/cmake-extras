@@ -1,0 +1,2 @@
+[type: gettext/ini] src/foo.ini.in
+@GENERATED_POTFILES@

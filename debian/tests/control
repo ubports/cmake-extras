@@ -13,3 +13,13 @@ Depends:
   cmake,
   cmake-extras,
   licensecheck | devscripts (<< 2.16.6)
+
+Tests: intltool
+Restrictions: allow-stderr
+Depends:
+  build-essential,
+  cmake,
+  cmake-extras,
+  intltool,
+  libglib2.0-dev,
+  pkg-config,
