@@ -20,6 +20,7 @@ Depends:
   build-essential,
   cmake,
   cmake-extras,
+  language-pack-en,
   intltool,
   libglib2.0-dev,
   pkg-config,
