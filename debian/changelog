@@ -1,3 +1,10 @@
+cmake-extras (1.0+17.04.20170110.1-0ubuntu1) zesty; urgency=medium
+
+  * Add autopkgtest for intltool macros
+  * Add autopkgtest for DoxygenBuilder macros
+
+ -- Pete Woods <pete.woods@canonical.com>  Tue, 10 Jan 2017 12:06:28 +0000
+
 cmake-extras (0.10+17.04.20161208.1-0ubuntu1) zesty; urgency=medium
 
   [ Pete ]
