@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# autopkgtest check: Build a trivial project that uses the
+# find_package(DoxygenBuilder) macro, verifying the output
+# behaves as expected.
+# (C) 2016 Canonical Ltd.
+# Author: Pete Woods <pete.woods@canonical.com>
+
+set -euo pipefail
+IFS=$'\n\t'
+
+tempdir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
+trap "rm -rf $tempdir" 0 INT QUIT ABRT PIPE TERM
+
+srcdir="$(pwd)/examples/doxygenbuilder-demo"
+bindir="${tempdir}/build"
+installdir="${tempdir}/install"
+
+mkdir -p "${bindir}"
+
+# Move into bindir temporarily
+(
+  cd "${bindir}"
+  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}"
+  make
+  make install
+)
+
+check_doc() {
+  # Print using a similar format to glib-test
+  echo -n "/doxygenbuilder/$1/$3: "
+
+  xmlfile="${installdir}/share/doc/doxygenbuilder-demo/xml/$1"
+  xpath="$2"
+  expected="$3"
+
+  output=$(xmllint --xpath "${xpath}" "${xmlfile}")
+
+  if [ "${output}" == "${expected}" ]; then
+    echo "OK"
+  else
+    echo "FAILED"
+    return 1
+  fi
+}
+
+check_doc 'indexpage.xml' '//compounddef/title/text()' 'DoxygenBuilder Demo'
+check_doc 'indexpage.xml' '//detaileddescription/sect1/title/text()' 'Introduction'
+check_doc 'indexpage.xml' '(//detaileddescription/sect1/para)[1]/text()' 'This is the introduction.'
+
+check_doc 'classMyNamespace_1_1MyClass.xml' '(//memberdef/definition)[1]/text()' 'MyNamespace::MyClass::MyClass'
+check_doc 'classMyNamespace_1_1MyClass.xml' '(//memberdef/definition)[2]/text()' 'MyNamespace::MyClass::~MyClass'
+check_doc 'classMyNamespace_1_1MyClass.xml' '(//memberdef/definition)[3]/text()' 'void MyNamespace::MyClass::myMethod'
+check_doc 'classMyNamespace_1_1MyClass.xml' '(//memberdef/definition)[4]/text()' 'int MyNamespace::MyClass::myOtherMethod'

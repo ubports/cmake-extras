@@ -1,0 +1,12 @@
+/*!
+\mainpage DoxygenBuilder Demo
+
+\tableofcontents
+
+\section sec_introduction Introduction
+
+This is the introduction.
+
+\include example-1.cpp
+
+*/
