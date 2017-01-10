@@ -24,3 +24,12 @@ Depends:
   intltool,
   libglib2.0-dev,
   pkg-config,
+
+Tests: doxygenbuilder
+Restrictions: allow-stderr
+Depends:
+  build-essential,
+  cmake,
+  cmake-extras,
+  doxygen,
+  libxml2-utils,
