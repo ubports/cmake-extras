@@ -7,3 +7,7 @@
 /.settings
 /.pydevproject
 *.user
+
+# Output from example builds
+examples/intltool-demo/po/Makefile.in.in
+examples/intltool-demo/po/POTFILES.in

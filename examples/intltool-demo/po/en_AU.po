@@ -1,0 +1,31 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Foocorp Ltd.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-04 14:51+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/foo.ini.in.h:1
+msgid "FooApp"
+msgstr "FooApp translated"
+
+#: ../src/foo.ini.in.h:2
+msgid "FooApp is really great"
+msgstr "FooApp is really great translated"
+
+#. Plain gettext translation from extracted string in this .cpp file
+#: ../src/main.cpp:49
+msgid "Hello FooApp!"
+msgstr "Hello translated FooApp!"

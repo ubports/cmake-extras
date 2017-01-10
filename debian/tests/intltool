@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# autopkgtest check: Build a trivial project that uses the
+# find_package(Intltool) macro, and verify that the resulting test binary
+# behaves as expected.
+# (C) 2016 Canonical Ltd.
+# Author: Pete Woods <pete.woods@canonical.com>
+
+set -euo pipefail
+IFS=$'\n\t'
+
+tempdir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
+trap "rm -rf $tempdir" 0 INT QUIT ABRT PIPE TERM
+
+demodir="$(pwd)/examples/intltool-demo"
+srcdir="${tempdir}/source"
+bindir="${tempdir}/build"
+installdir="${tempdir}/install"
+
+cp -r "${demodir}" "${srcdir}"
+mkdir -p "${bindir}"
+
+# Move into bindir temporarily
+(
+  cd "${bindir}"
+  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}"
+  make
+  make install
+)
+
+# Check the translatable strings have been extracted from the .ini and .cpp files
+check_potfile() {
+  # Print using a similar format to glib-test
+  echo -n "/potfile/$1: "
+
+  set +e
+  grep -q "$1" "${srcdir}/po/intltool-demo.pot"
+  retval=$?
+  set -e
+
+  if [ ${retval} -eq 0 ]; then
+    echo "OK"
+  else
+    echo "FAILED"
+  fi
+
+  return ${retval}
+}
+
+check_potfile 'msgid "FooApp"'
+check_potfile 'msgid "FooApp is really great"'
+check_potfile 'msgid "Hello FooApp!"'
+
+# This binary is a test suite that will exit this outer BASH script if it fails
+G_MESSAGES_DEBUG=all "${installdir}/usr/bin/fooapp"
+
