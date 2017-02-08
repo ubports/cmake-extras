@@ -33,3 +33,15 @@ Depends:
   cmake-extras,
   doxygen,
   libxml2-utils,
+
+Tests: includechecker
+Restrictions: allow-stderr
+Depends:
+  build-essential,
+  clang,
+  cmake,
+  cmake-extras,
+  libclang-3.8-dev
+  libglib2.0-dev,
+  pkg-config,
+  python-clang-3.8,

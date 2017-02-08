@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# autopkgtest check: Build a trivial project that uses the
+# find_package(IncludeChecker) macro, and verify that the resulting test binary
+# behaves as expected.
+# (C) 2016 Canonical Ltd.
+# Author: Pete Woods <pete.woods@canonical.com>
+
+set -euo pipefail
+IFS=$'\n\t'
+
+tempdir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
+trap "rm -rf $tempdir" 0 INT QUIT ABRT PIPE TERM
+
+srcdir="$(pwd)/examples/includechecker-demo"
+bindir="${tempdir}/build"
+installdir="${tempdir}/install"
+
+mkdir -p "${bindir}"
+
+# Move into bindir temporarily
+(
+  cd "${bindir}"
+  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}"
+  make
+  make check
+)
+
