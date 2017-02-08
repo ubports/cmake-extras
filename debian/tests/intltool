@@ -38,18 +38,20 @@ check_potfile() {
   retval=$?
   set -e
 
-  if [ ${retval} -eq 0 ]; then
+  expected=${2:-0}
+
+  if [ ${retval} -eq ${expected} ]; then
     echo "OK"
   else
     echo "FAILED"
+    return 1
   fi
-
-  return ${retval}
 }
 
 check_potfile 'msgid "FooApp"'
 check_potfile 'msgid "FooApp is really great"'
 check_potfile 'msgid "Hello FooApp!"'
+check_potfile 'msgid "this translation should be ignored"' 1
 
 # This binary is a test suite that will exit this outer BASH script if it fails
 G_MESSAGES_DEBUG=all "${installdir}/usr/bin/fooapp"

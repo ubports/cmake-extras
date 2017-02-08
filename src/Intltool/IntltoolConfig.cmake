@@ -155,10 +155,32 @@ function(_INTLTOOL_EXCLUDE_PATH LISTNAME FILTER OUTPUT)
     set(${OUTPUT} "${_TMP}" PARENT_SCOPE)
 endfunction()
 
+function(_INTLTOOL_LIST_FILTER INPUT OUTPUT)
+    set(_multiValueArgs EXPRESSIONS)
+    cmake_parse_arguments(_ARG "" "" "${_multiValueArgs}" ${ARGN})
+
+    if(_ARG_EXPRESSIONS)
+        set(_TMP "")
+        foreach(_ITEM ${${INPUT}})
+            foreach(_REGEX ${_ARG_EXPRESSIONS})
+                if("${_ITEM}" MATCHES "${_REGEX}")
+                else()
+                    list(APPEND _TMP "${_ITEM}")
+                endif()
+            endforeach()
+        endforeach()
+        set(${OUTPUT} "${_TMP}" PARENT_SCOPE)
+        unset(_TMP)
+    else()
+        set(${OUTPUT} "${${INPUT}}" PARENT_SCOPE)
+    endif()
+endfunction()
+
+
 function(INTLTOOL_UPDATE_POTFILE)
     set(_options ALL UBUNTU_SDK_DEFAULTS)
     set(_oneValueArgs COPYRIGHT_HOLDER GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
-    set(_multiValueArgs KEYWORDS FILE_GLOBS)
+    set(_multiValueArgs KEYWORDS FILE_GLOBS FILTER)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
     
@@ -213,7 +235,10 @@ function(INTLTOOL_UPDATE_POTFILE)
     )
 
     # We don't want to include paths from the binary directory
-    _intltool_exclude_path(_SOURCE_FILES ${CMAKE_BINARY_DIR} _FILTERED_SOURCE_FILES)
+    _intltool_exclude_path(_SOURCE_FILES ${CMAKE_BINARY_DIR} _FILTERED_SOURCE_FILES_TMP)
+
+    # Remove any paths from the filter expressions
+    _intltool_list_filter(_FILTERED_SOURCE_FILES_TMP _FILTERED_SOURCE_FILES EXPRESSIONS ${_ARG_FILTER})
 
     # Build the text to substitute into the POTFILES.in
     _intltool_join_list(_FILTERED_SOURCE_FILES "\n" GENERATED_POTFILES)
