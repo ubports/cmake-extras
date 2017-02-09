@@ -22,15 +22,18 @@ import os
 import sys
 from clang.cindex import Index
 
+
 class ParseException(Exception):
     def __init__(self, header, errors):
         self.header = header
         self.errors = errors
 
+
 class IncludeError:
     def __init__(self, header, includes):
         self.header = header
         self.includes = includes
+
 
 class IncludeChecker:
     def __init__(self, compiler_args):
@@ -46,17 +49,18 @@ class IncludeChecker:
         import re
         import subprocess
 
-        regex = re.compile(ur'(?:\#include \<...\> search starts here\:)(?P<list>.*?)(?:End of search list)', re.DOTALL);
-        process = subprocess.Popen(['clang++', '-v', '-E', '-x', 'c++', '-'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE);
-        process_out, process_err = process.communicate('');
-        output = process_out + process_err;
-        includes = [];
+        regex = re.compile(ur'(?:\#include \<...\> search starts here\:)(?P<list>.*?)(?:End of search list)',
+                           re.DOTALL)
+        process = subprocess.Popen(['clang++', '-v', '-E', '-x', 'c++', '-'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process_out, process_err = process.communicate('')
+        output = process_out + process_err
+        includes = []
         for p in re.search(regex, output).group('list').split('\n'):
-            p = p.strip();
+            p = p.strip()
             if len(p) > 0 and p.find('(framework directory)') < 0:
-                includes.append('-isystem');
-                includes.append(p);
-        return includes;
+                includes.append('-isystem')
+                includes.append(p)
+        return includes
 
     def check_include_dirs(self, dirs):
         errors = []
@@ -85,10 +89,10 @@ class IncludeChecker:
 
     def check_include(self, header, allowed):
         tu = self.index.parse('test.cpp',
-                unsaved_files = [('test.cpp', '#include <%s>\n' % header)],
-                args = self.compiler_args + self.system_includes)
+                              unsaved_files=[('test.cpp', '#include <%s>\n' % header)],
+                              args=self.compiler_args + self.system_includes)
         if not tu:
-            parser.error("unable to load input")
+            raise RuntimeError("unable to load input")
 
         if tu.diagnostics:
             raise ParseException(header, tu.diagnostics)
@@ -104,8 +108,9 @@ class IncludeChecker:
 
         return None
 
+
 def main():
-    from optparse import OptionParser, OptionGroup
+    from optparse import OptionParser
 
     parser = OptionParser("usage: %prog [options] -- [clang-args*]", version="%prog 1.0.0")
     parser.disable_interspersed_args()
