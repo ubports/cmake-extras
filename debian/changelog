@@ -1,9 +1,10 @@
-cmake-extras (1.1-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (1.1+17.04.20170209-0ubuntu1) zesty; urgency=medium
 
+  [ Pete ]
   * Add IncludeChecker macro.
   * Add FILTER argument to intltool macros.
 
- -- Pete <pete.woods@canonical.com>  Wed, 08 Feb 2017 15:02:38 +0000
+ -- Pete Woods <pete.woods@canonical.com>  Thu, 09 Feb 2017 12:47:56 +0000
 
 cmake-extras (1.0+17.04.20170110.1-0ubuntu1) zesty; urgency=medium
 
