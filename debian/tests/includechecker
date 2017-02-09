@@ -16,13 +16,55 @@ srcdir="$(pwd)/examples/includechecker-demo"
 bindir="${tempdir}/build"
 installdir="${tempdir}/install"
 
-mkdir -p "${bindir}"
+test_include_checker() {
+  expected="$1"
+  shift
+  message="$1"
+  shift
+  rm -rf "${bindir}"
+  mkdir -p "${bindir}"
+  echo "========================================================="
+  echo "Running build with cmake arguments: $@"
 
-# Move into bindir temporarily
-(
-  cd "${bindir}"
-  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}"
-  make
-  make check
-)
+  (
+    cd "${bindir}"
+    cmake $@ -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}" > /dev/null
+    make > /dev/null
+    set +e
+    make test &> /dev/null
+    retval=$?
+    set -e
+
+    if [ ${retval} -ne ${expected} ]; then
+      echo "Failed: Unexpected exit value ${retval}, expected ${expected}"
+      return 1
+    fi
+
+    if [ "${message}" != "" ]; then
+      echo "Checking for log message: ${message}"
+      set +e
+      grep -q "${message}" "Testing/Temporary/LastTest.log"
+      retval=$?
+      set -e
+      if [ ${retval} -ne 0 ]; then
+        echo "Failed: log message not found"
+        return 1
+      fi
+    fi
+
+    echo "Success"
+  )
+}
+
+# Disable all checks
+test_include_checker 0 "" -DINCLUDE_CHECK_FORBIDDEN='' -DINCLUDE_CHECK_ALLOWED='' -DINCLUDE_CHECK_IGNORE=''
+
+# Bad header should fail
+test_include_checker 2 "demolib/bad/bad-header.h" -DINCLUDE_CHECK_FORBIDDEN='glib.h' -DINCLUDE_CHECK_ALLOWED='' -DINCLUDE_CHECK_IGNORE='internal'
+
+# Internal header should fail
+test_include_checker 2 "demolib/internal/bar.h" -DINCLUDE_CHECK_FORBIDDEN='glib.h' -DINCLUDE_CHECK_ALLOWED='bad/bad-header.h:glib.h' -DINCLUDE_CHECK_IGNORE=''
+
+# Full checks with exclusions
+test_include_checker 0 "" -DINCLUDE_CHECK_FORBIDDEN='glib.h' -DINCLUDE_CHECK_ALLOWED='bad/bad-header.h:glib.h' -DINCLUDE_CHECK_IGNORE='internal'
 

@@ -23,16 +23,20 @@ endfunction()
 add_demolib_test("good-header-test" "")
 add_demolib_test("bad-header-test" "bad/")
 
+set(INCLUDE_CHECK_FORBIDDEN "glib.h" CACHE STRING "")
+set(INCLUDE_CHECK_ALLOWED "bad/bad-header.h:glib.h" CACHE STRING "")
+set(INCLUDE_CHECK_IGNORE "internal" CACHE STRING "")
+
 add_include_check(
     demolib-include-check
     DIRECTORIES
         "${CMAKE_SOURCE_DIR}/include"
     FORBIDDEN
-        "glib.h"
+        ${INCLUDE_CHECK_FORBIDDEN}
     ALLOWED
-        "bad/bad-header.h:glib.h"
+        ${INCLUDE_CHECK_ALLOWED}
     IGNORE
-        "internal"
+        ${INCLUDE_CHECK_IGNORE}
     FILE_EXTENSIONS
         ".h"
         ".hxx"
