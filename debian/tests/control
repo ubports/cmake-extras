@@ -41,7 +41,7 @@ Depends:
   clang,
   cmake,
   cmake-extras,
-  libclang-3.8-dev
+  libclang-3.8-dev,
   libglib2.0-dev,
   pkg-config,
   python-clang-3.8,
