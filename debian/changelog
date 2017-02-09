@@ -1,6 +1,7 @@
 cmake-extras (1.1-0ubuntu1) UNRELEASED; urgency=medium
 
   * Add IncludeChecker macro.
+  * Add FILTER argument to intltool macros.
 
  -- Pete <pete.woods@canonical.com>  Wed, 08 Feb 2017 15:02:38 +0000
 

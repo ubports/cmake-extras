@@ -6,6 +6,7 @@ intltool_update_potfile(
     POTFILES_TEMPLATE "POTFILES.in.in"
     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
     COPYRIGHT_HOLDER "Foocorp Ltd."
+    FILTER ".*test.*"
 )
 
 intltool_install_translations(
