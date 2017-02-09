@@ -1,3 +1,9 @@
+cmake-extras (1.1-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Add IncludeChecker macro.
+
+ -- Pete <pete.woods@canonical.com>  Wed, 08 Feb 2017 15:02:38 +0000
+
 cmake-extras (1.0+17.04.20170110.1-0ubuntu1) zesty; urgency=medium
 
   * Add autopkgtest for intltool macros
