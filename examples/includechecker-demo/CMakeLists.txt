@@ -18,8 +18,4 @@ endif()
 
 enable_testing()
 add_subdirectory(test)
-ADD_CUSTOM_TARGET(
-  check
-  ${CMAKE_CTEST_COMMAND} --force-new-ctest-process --output-on-failure
-)
 
