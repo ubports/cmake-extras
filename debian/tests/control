@@ -54,3 +54,4 @@ Depends:
   cmake-extras,
   libglib2.0-dev,
   pkg-config,
+  uuid-runtime,

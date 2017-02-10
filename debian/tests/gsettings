@@ -18,10 +18,36 @@ installdir="${tempdir}/install"
 cp -r "${demodir}" "${srcdir}"
 mkdir -p "${bindir}"
 
+DEFAULT_UUID=$(uuidgen)
+
 # Move into bindir temporarily
 (
   cd "${bindir}"
-  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}"
+  cmake "${srcdir}" -DCMAKE_INSTALL_PREFIX="${installdir}" -DGSETTINGS_LOCALINSTALL=1 -DGSETTINGS_COMPILE=1 -DDEFAULT_UUID_VALUE=${DEFAULT_UUID}
   make
-  make install
+  make VERBOSE=1 install
 )
+
+### Test the schemas
+export GSETTINGS_SCHEMA_DIR="${installdir}/share/glib-2.0/schemas"
+
+# verify generated schema
+VALUE=$(gsettings get com.canonical.cmake-extras.generated-test install-id)
+
+if [ "x${VALUE}" != "x'${DEFAULT_UUID}'" ]; then
+    echo "Generated schema is wrong."
+    echo "\tActual:   ${VALUE}"
+    echo "\tExpected: '${DEFAULT_UUID}'"
+    exit 1
+fi
+
+# verify static schema
+VALUE=$(gsettings get com.canonical.cmake-extras.static-test use-gsettings)
+
+EXPECTED=false
+if [ ${VALUE} != ${EXPECTED} ]; then
+    echo "Generated schema is wrong."
+    echo "\tActual:   ${VALUE}"
+    echo "\tExpected: ${EXPECTED}"
+    exit 1
+fi

@@ -4,6 +4,9 @@ project(intltool-demo)
 include(GNUInstallDirs)
 find_package(GSettings)
 
+set (DEFAULT_UUID_VALUE "" CACHE STRING "Default UUID to use in schema.")
+set (DEFAULT_UUID "'${DEFAULT_UUID_VALUE}'")
+
 add_schema ("static.gschema.xml")
 
 configure_file ("generated.gschema.xml.in" "generated.gschema.xml")
