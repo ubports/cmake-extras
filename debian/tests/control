@@ -45,3 +45,12 @@ Depends:
   libglib2.0-dev,
   pkg-config,
   python-clang-3.8,
+
+Tests: gsettings
+Restrictions: allow-stderr
+Depends:
+  build-essential,
+  cmake,
+  cmake-extras,
+  libglib2.0-dev,
+  pkg-config,
