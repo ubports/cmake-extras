@@ -1,4 +1,4 @@
-cmake-extras (1.0-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (1.2-0ubuntu1) UNRELEASED; urgency=medium
 
   * Add autopkgtest for gsettings macro.
   * Handle generated gschema files. (LP: #1661686)
