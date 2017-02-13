@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="com.canonical.cmake-extras.static-test" path="/com/canonical/cmake-extras/static-test/">
+    <key name="use-gsettings" type="b">
+      <default>false</default>
+      <summary>Just a test</summary>
+      <description>No really, it's just a test.</description>
+    </key>
+  </schema>
+</schemalist>

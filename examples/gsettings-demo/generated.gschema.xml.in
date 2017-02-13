@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="com.canonical.cmake-extras.generated-test" path="/com/canonical/cmake-extras/generated-test/">
+    <key name="install-id" type="s">
+      <default>@DEFAULT_UUID@</default>
+      <summary>Just a test</summary>
+      <description>No really, it's just a test.</description>
+    </key>
+  </schema>
+</schemalist>
