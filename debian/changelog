@@ -1,9 +1,9 @@
-cmake-extras (1.2-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (1.2+17.04.20170213-0ubuntu1) zesty; urgency=medium
 
   * Add autopkgtest for gsettings macro.
   * Handle generated gschema files. (LP: #1661686)
 
- -- Rodney Dawes <rodney.dawes@canonical.com>  Fri, 10 Feb 2017 18:01:37 -0500
+ -- Rodney Dawes <rodney.dawes@canonical.com>  Mon, 13 Feb 2017 18:16:40 +0000
 
 cmake-extras (1.1+17.04.20170209-0ubuntu1) zesty; urgency=medium
 
