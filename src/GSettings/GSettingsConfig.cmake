@@ -33,7 +33,7 @@ endif()
 macro(add_schema SCHEMA_NAME)
     # Use the correct schema file as it may be generated
     if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${SCHEMA_NAME})
-      file (COPY ${SCHEMA_NAME} ${SCHEMA_NAME})
+      file (COPY ${SCHEMA_NAME} DESTINATION ${SCHEMA_NAME})
     endif ()
     set (SCHEMA_FILE "${CMAKE_CURRENT_BINARY_DIR}/${SCHEMA_NAME}")
 
