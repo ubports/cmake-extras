@@ -1,10 +1,10 @@
+find_package(GSettings)
 
 # INI file with translations embedded
 
 intltool_merge_translations(
-  "${CMAKE_CURRENT_SOURCE_DIR}/foo.ini.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/foo.ini"
-  ALL
+  "foo.ini.in"
+  "foo.ini"
   UTF8
 )
 
@@ -12,6 +12,17 @@ install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/foo.ini"
   DESTINATION ${CMAKE_INSTALL_DATADIR}/fooapp
 )
+
+# Translation merge tests for non-desktop file without translations
+intltool_merge_translations(
+  "translated.gschema.xml.in"
+  "translated.gschema.xml"
+  UTF8
+  STYLE "xml"
+  NO_TRANSLATIONS
+)
+
+add_schema("translated.gschema.xml")
 
 # FooApp executable
 

@@ -1,4 +1,5 @@
 #include <memory>
+#include <gio/gio.h>
 #include <glib.h>
 #include <libintl.h>
 
@@ -47,6 +48,21 @@ static void translations() {
     g_assert_cmpstr(_("Hello FooApp!"), ==, "Hello translated FooApp!");
 }
 
+static void schema_translations() {
+    shared_ptr<GSettingsSchemaSource> source(g_settings_schema_source_get_default(), &g_settings_schema_source_unref);
+    shared_ptr<GSettingsSchema> schema(g_settings_schema_source_lookup(source.get(),
+                                                                       "com.canonical.cmake-extras.translated-test",
+                                                                       false),
+                                       &g_settings_schema_unref);
+    shared_ptr<GSettingsSchemaKey> key(g_settings_schema_get_key(schema.get(), "translated"), &g_settings_schema_key_unref);
+
+    auto summary = g_settings_schema_key_get_summary(key.get());
+    auto description = g_settings_schema_key_get_description(key.get());
+
+    g_assert_cmpstr(summary, ==, "Translated test mate");
+    g_assert_cmpstr(description, ==, "G'day mate, it's a test!");
+}
+
 }
 
 int main(int argc, char** argv) {
@@ -65,6 +81,7 @@ int main(int argc, char** argv) {
 
     g_test_init (&argc, &argv, NULL);
     g_test_add_func("/intltool-demo/translations", translations);
+    g_test_add_func("/intltool-demo/schema-translations", schema_translations);
 
     return g_test_run();
 }

@@ -16,13 +16,22 @@
 # 
 # An example of common usage is:
 #
-# For an ini file:
+# For a .desktop file:
 #
 # intltool_merge_translations(
-#   "foo.ini.in"
-#   "${CMAKE_CURRENT_BINARY_DIR}/foo.ini"
-#   ALL
+#   "foo.desktop.in"
+#   "foo.destkop"
 #   UTF8
+# )
+#
+# For a .gschema.xml file:
+#
+# intltool_merge_translations(
+#   "foo.gschema.xml.in"
+#   "foo.gschema.xml"
+#   UTF8
+#   STYLE "xml"
+#   NO_TRANSLATIONS
 # )
 #
 # Inside po/CMakeLists.txt:
@@ -345,14 +354,17 @@ function(INTLTOOL_INSTALL_TRANSLATIONS)
     endforeach()
 endfunction()
 
-function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
-    set(_options ALL UTF8 PASS_THROUGH)
-    set(_oneValueArgs PO_DIRECTORY)
+macro(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
+    # PASS_THROUGH option in intltool-emrge is deprecated, so to is it here.
+    # We must keep it around as an option though, to avoid breaking things.
+    set(_options UTF8 PASS_THROUGH NO_TRANSLATIONS)
+    set(_oneValueArgs PO_DIRECTORY STYLE)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "" ${ARGN})
 
     get_filename_component(_ABS_FILENAME ${FILENAME} ABSOLUTE)
-
+    file(RELATIVE_PATH _REL_FILENAME ${CMAKE_SOURCE_DIR} ${_ABS_FILENAME})
+    
     set(_PO_DIRECTORY "${CMAKE_SOURCE_DIR}/po")
     if(_ARG_PO_DIRECTORY)
         set(_PO_DIRECTORY "${_ARG_PO_DIRECTORY}")
@@ -363,43 +375,27 @@ function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
         set(_UTF8 "--utf8")
     endif()
 
-    set(_PASS_THROUGH "")
-    if(_ARG_PASS_THROUGH)
-        set(_PASS_THROUGH "--pass-through")
+    # When --no-translations is used with XML should not get used,
+    # so we default to using it for the arg, to use otherwise.
+    set(_NO_TRANSLATIONS "${_PO_DIRECTORY}")
+    if(_ARG_NO_TRANSLATIONS)
+        set(_NO_TRANSLATIONS "--no-translations")
     endif()
-    
-    file(
-        GLOB_RECURSE _PO_FILES
-        ${_PO_DIRECTORY}/*.po
+
+    set(_STYLE "--desktop-style")
+    if(_ARG_STYLE)
+      set(_STYLE "--${_ARG_STYLE}-style")
+    endif()
+
+    message(STATUS "Merging translations: ${_REL_FILENAME}")
+    execute_process(
+      COMMAND ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_ABS_FILENAME} ${OUTPUT_FILE}
+      ERROR_VARIABLE _merge_failed
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-    add_custom_command(
-        OUTPUT
-          ${OUTPUT_FILE}
-        COMMAND
-          ${INTLTOOL_MERGE_EXECUTABLE} --desktop-style --quiet ${_UTF8} ${_PASS_THROUGH} ${_PO_DIRECTORY} ${FILENAME} ${OUTPUT_FILE}
-        DEPENDS
-          ${_ABS_FILENAME}
-          ${_PO_FILES}
-        WORKING_DIRECTORY
-          ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-    
-    get_filename_component(_OUTPUT_NAME ${OUTPUT_FILE} NAME)
-    _GETTEXT_GET_UNIQUE_TARGET_NAME(${_OUTPUT_NAME} _UNIQUE_TARGET_NAME)
-
-    if(_ARG_ALL)
-        add_custom_target(
-          ${_UNIQUE_TARGET_NAME}
-          ALL
-          DEPENDS
-            ${OUTPUT_FILE}
-        )
-    else()
-        add_custom_target(
-          ${_UNIQUE_TARGET_NAME}
-          DEPENDS
-            ${OUTPUT_FILE}
-        )
+    if(_merge_failed)
+      message(SEND_ERROR "Translation merge failed: ${_merge_failed}")
     endif()
-endfunction()
+endmacro()

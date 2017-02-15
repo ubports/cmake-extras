@@ -53,6 +53,9 @@ check_potfile 'msgid "FooApp is really great"'
 check_potfile 'msgid "Hello FooApp!"'
 check_potfile 'msgid "this translation should be ignored"' 1
 
+# From the schema file
+check_potfile "Just a test"
+check_potfile "No really, it's just a test."
+
 # This binary is a test suite that will exit this outer BASH script if it fails
 G_MESSAGES_DEBUG=all "${installdir}/usr/bin/fooapp"
-
