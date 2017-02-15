@@ -11,3 +11,5 @@ add_schema ("static.gschema.xml")
 
 configure_file ("generated.gschema.xml.in" "generated.gschema.xml")
 add_schema ("generated.gschema.xml")
+
+compile_schemas(${CMAKE_CURRENT_BINARY_DIR})

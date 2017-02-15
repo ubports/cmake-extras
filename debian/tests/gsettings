@@ -29,25 +29,24 @@ DEFAULT_UUID=$(uuidgen)
 )
 
 ### Test the schemas
+check_schema() {
+    VALUE=$(gsettings get $1 $2)
+    EXPECTED=$3
+
+    if [ ${VALUE} != ${EXPECTED} ]; then
+        echo "Generated schema is wrong."
+        echo "\tActual:   ${VALUE}"
+        echo "\tExpected: ${EXPECTED}"
+        return 1
+    fi
+}
+
+# Verify the built schemas
+export GSETTINGS_SCHEMA_DIR="${bindir}"
+check_schema(com.canonical.cmake-extras.generated-test install-id "'${DEFAULT_UUID}'")
+check_schema(gsettings get com.canonical.cmake-extras.static-test use-gsettings false)
+
+# Verify the installed schemas
 export GSETTINGS_SCHEMA_DIR="${installdir}/share/glib-2.0/schemas"
-
-# verify generated schema
-VALUE=$(gsettings get com.canonical.cmake-extras.generated-test install-id)
-
-if [ "x${VALUE}" != "x'${DEFAULT_UUID}'" ]; then
-    echo "Generated schema is wrong."
-    echo "\tActual:   ${VALUE}"
-    echo "\tExpected: '${DEFAULT_UUID}'"
-    exit 1
-fi
-
-# verify static schema
-VALUE=$(gsettings get com.canonical.cmake-extras.static-test use-gsettings)
-
-EXPECTED=false
-if [ ${VALUE} != ${EXPECTED} ]; then
-    echo "Generated schema is wrong."
-    echo "\tActual:   ${VALUE}"
-    echo "\tExpected: ${EXPECTED}"
-    exit 1
-fi
+check_schema(com.canonical.cmake-extras.generated-test install-id "'${DEFAULT_UUID}'")
+check_schema(gsettings get com.canonical.cmake-extras.static-test use-gsettings false)
