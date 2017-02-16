@@ -1,6 +1,9 @@
 # GSettingsConfig.cmake, CMake macros written for Marlin, feel free to re-use them.
 find_package(PkgConfig REQUIRED)
 
+# We need this for generating unique target identifiers
+find_package(Gettext REQUIRED)
+
 # Find the binary for compiling schemas
 execute_process(
   COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_schemas
@@ -27,54 +30,52 @@ message (STATUS "GSettings schemas will be installed into ${GSETTINGS_DIR}")
 # Have an option to compile the schemas once installed
 option (GSETTINGS_COMPILE "Compile GSettings schemas after installation" OFF)
 if(GSETTINGS_COMPILE)
-    message(STATUS "GSettings schemas will be compiled.")
+    message(STATUS "Installed GSettings schemas will be compiled.")
 endif()
 
-macro(add_schema SCHEMA_NAME)
-    # Use the correct schema file as it may be generated
-    if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${SCHEMA_NAME})
-      file (COPY ${SCHEMA_NAME} DESTINATION ${SCHEMA_NAME})
-    endif ()
-    set (SCHEMA_FILE "${CMAKE_CURRENT_BINARY_DIR}/${SCHEMA_NAME}")
-
-    # Run the validator and error if it fails
-    execute_process (
-      COMMAND ${_GLIB_COMPILE_SCHEMAS} --dry-run --schema-file=${SCHEMA_FILE}
-      ERROR_VARIABLE _schemas_invalid
-      OUTPUT_STRIP_TRAILING_WHITESPACE
+function(add_schema SCHEMA_NAME)
+  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    APPEND PROPERTY _SCHEMA_FILES "${SCHEMA_NAME}"
+    )
+  add_custom_target(${SCHEMA_NAME}
+    COMMAND ${_GLIB_COMPILE_SCHEMAS} --dry-run --schema-file=${SCHEMA_FILE}
+    DEPENDS ${SCHEMA_FILE}
     )
 
-    if (_schemas_invalid)
-      message (SEND_ERROR "Schema validation error: ${_schemas_invalid}")
-    endif (_schemas_invalid)
+  # Install the schemas
+  install (FILES ${SCHEMA_FILE} DESTINATION ${GSETTINGS_DIR} OPTIONAL)
 
-    # Install the schemas
-    install (FILES ${SCHEMA_FILE} DESTINATION ${GSETTINGS_DIR} OPTIONAL)
+  # Add a rule to compile the schemas if so enabled
+  # FIXME: This should ideally only be called once, after all the files
+  # have been installed, but we must do so every time currently, due
+  # to a bug in cmake lacking ability to order last (LP: #1665006)
+  if(GSETTINGS_COMPILE)
+    install (CODE "compile_schemas (${GSETTINGS_DIR})")
+  endif()
+endfunction()
 
-    # Add a rule to compile the schemas if so enabled
-    # FIXME: This should ideally only be called once, after all the files
-    # have been installed, but we must do so every time currently, due
-    # to a bug in cmake lacking ability to order last (LP: #1665006)
-    if(GSETTINGS_COMPILE)
-      install (CODE "compile_schemas (${GSETTINGS_DIR})")
-    endif()
-endmacro()
-
-macro(compile_schemas SCHEMA_DIR)
+function(compile_schemas SCHEMA_DIR)
   if (${SCHEMA_DIR} MATCHES "^${CMAKE_SOURCE_DIR}.*$")
-    set_property (
-      DIRECTORY "${CMAKE_SOURCE_DIR}"
-      APPEND
-      PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "gschemas.compiled"
-    )
-  endif ()
-  execute_process (
-    COMMAND "${_GLIB_COMPILE_SCHEMAS}" "${SCHEMA_DIR}"
-    ERROR_VARIABLE _schema_compile_error
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  if (_schema_compile_error)
-    message (SEND_ERROR "Schemas compile failed: ${_schema_compile_error}")
-  endif (_schema_compile_error)
-  message (STATUS "Compiling GSettings schemas in: ${SCHEMA_DIR}")
-endmacro()
+    set(OUTPUT_FILE "${SCHEMA_DIR}/gschemas.compiled")
+    add_custom_command(
+      OUTPUT ${OUTPUT_FILE}
+      COMMAND "${_GLIB_COMPILE_SCHEMAS}" "${SCHEMA_DIR}"
+      BYPRODUCTS ${OUTPUT_FILE}
+      DEPENDS ${_SCHEMA_FILES}
+      )
+    _GETTEXT_GET_UNIQUE_TARGET_NAME("gschemas.compiled" _UNIQUE_TARGET_NAME)
+    add_custom_target(${_UNIQUE_TARGET_NAME} ALL
+      DEPENDS ${OUTPUT_FILE}
+      )
+  else()
+    message(STATUS "Compiling GSettings schemas in: ${SCHEMA_DIR}")
+    execute_process(
+      COMMAND "${_GLIB_COMPILE_SCHEMAS}" "${SCHEMA_DIR}"
+      ERROR_VARIABLE _schema_compile_error
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+      if(_schema_compile_error)
+        message(SEND_ERROR "Schemas compile failed: ${_schema_compile_error}")
+      endif(_schema_compile_error)
+    endif()
+endfunction()
