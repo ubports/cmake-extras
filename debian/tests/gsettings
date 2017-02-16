@@ -33,7 +33,7 @@ check_schema() {
     VALUE=$(gsettings get $1 $2)
     EXPECTED=$3
 
-    if [ ${VALUE} != ${EXPECTED} ]; then
+    if [ "${VALUE}" != "${EXPECTED}" ]; then
         echo "Generated schema is wrong."
         echo "\tActual:   ${VALUE}"
         echo "\tExpected: ${EXPECTED}"
