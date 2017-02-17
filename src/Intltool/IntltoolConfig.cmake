@@ -399,9 +399,13 @@ function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
     )
 
     add_custom_command(
-        OUTPUT ${OUTPUT_FILE}
-        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_ABS_FILENAME} ${OUTPUT_FILE}
-        DEPENDS ${FILENAME} ${_PO_FILES}
+        OUTPUT
+          ${OUTPUT_FILE}
+        COMMAND
+          ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_ABS_FILENAME} ${OUTPUT_FILE}
+        DEPENDS
+          ${FILENAME}
+          ${_PO_FILES}
     )
 
     get_filename_component(_OUTPUT_NAME ${OUTPUT_FILE} NAME)
@@ -410,12 +414,14 @@ function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
         add_custom_target(
           ${_OUTPUT_NAME}
           ALL
-          DEPENDS ${OUTPUT_FILE}
+          DEPENDS
+            ${OUTPUT_FILE}
         )
     else()
         add_custom_target(
           ${_OUTPUT_NAME}
-          DEPENDS ${OUTPUT_FILE}
+          DEPENDS
+            ${OUTPUT_FILE}
         )
     endif()
 endfunction()
