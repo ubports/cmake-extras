@@ -39,9 +39,10 @@ function(add_schema SCHEMA_NAME)
     APPEND PROPERTY _SCHEMA_FILES "${SCHEMA_NAME}"
     )
   add_custom_target(
-    ${SCHEMA_NAME}
+    "validate-${SCHEMA_NAME}"
     ALL
     COMMAND ${_GLIB_COMPILE_SCHEMAS} --dry-run --schema-file=${SCHEMA_FILE}
+    COMMENT "Validating ${SCHEMA_NAME}"
     DEPENDS ${SCHEMA_FILE}
     )
 
@@ -60,6 +61,11 @@ endfunction()
 function(compile_schemas SCHEMA_DIR)
   if (${SCHEMA_DIR} MATCHES "^${CMAKE_SOURCE_DIR}.*$")
     set(OUTPUT_FILE "${SCHEMA_DIR}/gschemas.compiled")
+    get_property(
+      _SCHEMA_FILES
+      DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      PROPERTY _SCHEMA_FILES
+      )
     add_custom_command(
       OUTPUT ${OUTPUT_FILE}
       COMMAND "${_GLIB_COMPILE_SCHEMAS}" "${SCHEMA_DIR}"
