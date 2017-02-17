@@ -34,10 +34,13 @@ if(GSETTINGS_COMPILE)
 endif()
 
 function(add_schema SCHEMA_NAME)
-  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  set_property(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     APPEND PROPERTY _SCHEMA_FILES "${SCHEMA_NAME}"
     )
-  add_custom_target(${SCHEMA_NAME} ALL
+  add_custom_target(
+    ${SCHEMA_NAME}
+    ALL
     COMMAND ${_GLIB_COMPILE_SCHEMAS} --dry-run --schema-file=${SCHEMA_FILE}
     DEPENDS ${SCHEMA_FILE}
     )
@@ -64,7 +67,9 @@ function(compile_schemas SCHEMA_DIR)
       DEPENDS ${_SCHEMA_FILES}
       )
     _GETTEXT_GET_UNIQUE_TARGET_NAME("gschemas.compiled" _UNIQUE_TARGET_NAME)
-    add_custom_target(${_UNIQUE_TARGET_NAME} ALL
+    add_custom_target(
+      ${_UNIQUE_TARGET_NAME}
+      ALL
       DEPENDS ${OUTPUT_FILE}
       )
   else()
