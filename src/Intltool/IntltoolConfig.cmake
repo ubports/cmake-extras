@@ -21,6 +21,7 @@
 # intltool_merge_translations(
 #   "foo.desktop.in"
 #   "foo.destkop"
+#   ALL
 #   UTF8
 # )
 #
@@ -29,6 +30,7 @@
 # intltool_merge_translations(
 #   "foo.gschema.xml.in"
 #   "foo.gschema.xml"
+#   ALL
 #   UTF8
 #   STYLE "xml"
 #   NO_TRANSLATIONS
@@ -354,7 +356,7 @@ function(INTLTOOL_INSTALL_TRANSLATIONS)
     endforeach()
 endfunction()
 
-macro(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
+function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
     # PASS_THROUGH option in intltool-emrge is deprecated, so to is it here.
     # We must keep it around as an option though, to avoid breaking things.
     set(_options UTF8 PASS_THROUGH NO_TRANSLATIONS)
@@ -375,6 +377,11 @@ macro(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
         set(_UTF8 "--utf8")
     endif()
 
+    # Deprecated
+    if(_ARG_PASS_THROUGH)
+      message(DEPRECATION "PASS_THROUGH option is deprecated. Do not use it.")
+    endif()
+
     # When --no-translations is used with XML should not get used,
     # so we default to using it for the arg, to use otherwise.
     set(_NO_TRANSLATIONS "${_PO_DIRECTORY}")
@@ -387,15 +394,29 @@ macro(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
       set(_STYLE "--${_ARG_STYLE}-style")
     endif()
 
-    message(STATUS "Merging translations: ${_REL_FILENAME}")
-    execute_process(
-      COMMAND ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_ABS_FILENAME} ${OUTPUT_FILE}
-      ERROR_VARIABLE _merge_failed
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    file(
+        GLOB_RECURSE _PO_FILES
+        ${_PO_DIRECTORY}/*.po
     )
 
-    if(_merge_failed)
-      message(SEND_ERROR "Translation merge failed: ${_merge_failed}")
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_ABS_FILENAME} ${OUTPUT_FILE}
+        DEPENDS ${FILENAME} ${_PO_FILES}
+    )
+
+    get_filename_component(_OUTPUT_NAME ${OUTPUT_FILE} NAME)
+
+    if(_ARG_ALL)
+        add_custom_target(
+          ${_OUTPUT_NAME}
+          ALL
+          DEPENDS ${OUTPUT_FILE}
+        )
+    else()
+        add_custom_target(
+          ${_OUTPUT_NAME}
+          DEPENDS ${OUTPUT_FILE}
+        )
     endif()
-endmacro()
+endfunction()
