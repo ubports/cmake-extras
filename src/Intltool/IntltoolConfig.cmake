@@ -365,8 +365,7 @@ function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "" ${ARGN})
 
     get_filename_component(_ABS_FILENAME ${FILENAME} ABSOLUTE)
-    file(RELATIVE_PATH _REL_FILENAME ${CMAKE_SOURCE_DIR} ${_ABS_FILENAME})
-    
+
     set(_PO_DIRECTORY "${CMAKE_SOURCE_DIR}/po")
     if(_ARG_PO_DIRECTORY)
         set(_PO_DIRECTORY "${_ARG_PO_DIRECTORY}")
