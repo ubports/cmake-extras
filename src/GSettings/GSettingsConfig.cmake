@@ -66,7 +66,11 @@ function(add_schema SCHEMA_NAME)
   # have been installed, but we must do so every time currently, due
   # to a bug in cmake lacking ability to order last (LP: #1665006)
   if(GSETTINGS_COMPILE)
-    install (CODE "compile_schemas (${GSETTINGS_DIR})")
+    install (CODE "
+      find_package(GSettings REQUIRED)
+      compile_schemas(${GSETTINGS_DIR})
+      "
+      )
   endif()
 endfunction()
 
