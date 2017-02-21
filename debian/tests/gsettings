@@ -25,6 +25,7 @@ DEFAULT_UUID=$(uuidgen)
   cd "${bindir}"
   cmake "${srcdir}" -DCMAKE_INSTALL_PREFIX="${installdir}" -DGSETTINGS_LOCALINSTALL=1 -DGSETTINGS_COMPILE=1 -DDEFAULT_UUID_VALUE=${DEFAULT_UUID}
   make
+  make ARGS+="--output-on-failure" test
   make VERBOSE=1 install
 )
 
