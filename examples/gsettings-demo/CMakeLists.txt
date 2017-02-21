@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(intltool-demo)
 
+enable_testing()
+
 include(GNUInstallDirs)
 find_package(GSettings)
 

@@ -34,16 +34,28 @@ if(GSETTINGS_COMPILE)
 endif()
 
 function(add_schema SCHEMA_NAME)
+  # Make sure a target exists
+  if(NOT TARGET ${SCHEMA_NAME})
+    add_custom_target(
+      ${SCHEMA_NAME}
+      COMMAND true
+      )
+  endif()
+
+  # Use the correct schema file as it may be generated
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${SCHEMA_NAME})
+    set(SCHEMA_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${SCHEMA_NAME}")
+  else()
+    set(SCHEMA_FILE "${CMAKE_CURRENT_BINARY_DIR}/${SCHEMA_NAME}")
+  endif()
+
   set_property(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     APPEND PROPERTY _SCHEMA_FILES "${SCHEMA_NAME}"
     )
-  add_custom_target(
-    "validate-${SCHEMA_NAME}"
-    ALL
+  add_test(
+    NAME "validate-${SCHEMA_NAME}"
     COMMAND ${_GLIB_COMPILE_SCHEMAS} --dry-run --schema-file=${SCHEMA_FILE}
-    COMMENT "Validating ${SCHEMA_NAME}"
-    DEPENDS ${SCHEMA_FILE}
     )
 
   # Install the schemas

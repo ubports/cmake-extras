@@ -52,6 +52,7 @@ Depends:
   build-essential,
   cmake,
   cmake-extras,
+  gettext,
   libglib2.0-dev,
   pkg-config,
   uuid-runtime,
