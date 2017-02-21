@@ -1,10 +1,11 @@
-find_package(GSettings)
+find_package(GSettings REQUIRED)
 
 # INI file with translations embedded
 
 intltool_merge_translations(
   "foo.ini.in"
   "foo.ini"
+  ALL
   UTF8
 )
 
@@ -17,6 +18,7 @@ install(
 intltool_merge_translations(
   "translated.gschema.xml.in"
   "translated.gschema.xml"
+  ALL
   UTF8
   STYLE "xml"
   NO_TRANSLATIONS
