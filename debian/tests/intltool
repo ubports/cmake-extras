@@ -57,5 +57,8 @@ check_potfile 'msgid "this translation should be ignored"' 1
 check_potfile "Just a test"
 check_potfile "No really, it's just a test."
 
+# Needed for loading the installed schemas, as it's not standard glib path
+export GSETTINGS_SCHEMA_DIR="${installdir}/share/glib-2.0/schemas"
+
 # This binary is a test suite that will exit this outer BASH script if it fails
 G_MESSAGES_DEBUG=all "${installdir}/usr/bin/fooapp"

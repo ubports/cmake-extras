@@ -49,12 +49,17 @@ static void translations() {
 }
 
 static void schema_translations() {
-    shared_ptr<GSettingsSchemaSource> source(g_settings_schema_source_get_default(), &g_settings_schema_source_unref);
-    shared_ptr<GSettingsSchema> schema(g_settings_schema_source_lookup(source.get(),
+    GSettingsSchemaSource* source = g_settings_schema_source_get_default();
+    g_assert_nonnull(source);
+
+    shared_ptr<GSettingsSchema> schema(g_settings_schema_source_lookup(source,
                                                                        "com.canonical.cmake-extras.translated-test",
                                                                        false),
                                        &g_settings_schema_unref);
+    g_assert_nonnull(schema.get());
+
     shared_ptr<GSettingsSchemaKey> key(g_settings_schema_get_key(schema.get(), "translated"), &g_settings_schema_key_unref);
+    g_assert_nonnull(key.get());
 
     auto summary = g_settings_schema_key_get_summary(key.get());
     auto description = g_settings_schema_key_get_description(key.get());
