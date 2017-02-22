@@ -42,9 +42,11 @@ function(add_schema SCHEMA_NAME)
       )
   endif()
 
-  # Use the correct schema file as it may be generated
+  # Always copy the schema file to BINARY_DIR as schema compilation
+  # should be done on binary dir, when needed for tests.
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${SCHEMA_NAME})
     set(SCHEMA_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${SCHEMA_NAME}")
+    file(COPY "${SCHEMA_FILE}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
   else()
     set(SCHEMA_FILE "${CMAKE_CURRENT_BINARY_DIR}/${SCHEMA_NAME}")
   endif()
