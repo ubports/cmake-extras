@@ -359,12 +359,10 @@ endfunction()
 function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
     # PASS_THROUGH option in intltool-emrge is deprecated, so to is it here.
     # We must keep it around as an option though, to avoid breaking things.
-    set(_options UTF8 PASS_THROUGH NO_TRANSLATIONS)
+    set(_options ALL UTF8 PASS_THROUGH NO_TRANSLATIONS)
     set(_oneValueArgs PO_DIRECTORY STYLE)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "" ${ARGN})
-
-    get_filename_component(_ABS_FILENAME ${FILENAME} ABSOLUTE)
 
     set(_PO_DIRECTORY "${CMAKE_SOURCE_DIR}/po")
     if(_ARG_PO_DIRECTORY)
@@ -398,30 +396,39 @@ function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
         ${_PO_DIRECTORY}/*.po
     )
 
+    get_filename_component(_INPUT_NAME ${FILENAME} NAME)
+    get_filename_component(_OUTPUT_NAME ${OUTPUT_FILE} NAME)
+    set(_ABS_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${_OUTPUT_NAME})
+
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_INPUT_NAME})
+      set(_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${_INPUT_NAME})
+    else()
+      set(_INPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/${_INPUT_NAME})
+    endif()
+
     add_custom_command(
         OUTPUT
-          ${OUTPUT_FILE}
+          ${_ABS_OUTPUT_FILE}
         COMMAND
-          ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_ABS_FILENAME} ${OUTPUT_FILE}
+          ${INTLTOOL_MERGE_EXECUTABLE} ${_STYLE} --quiet ${_UTF8} ${_NO_TRANSLATIONS} ${_INPUT_FILE} ${_OUTPUT_NAME}
         DEPENDS
-          ${FILENAME}
+          ${_INPUT_FILE}
           ${_PO_FILES}
     )
 
-    get_filename_component(_OUTPUT_NAME ${OUTPUT_FILE} NAME)
 
     if(_ARG_ALL)
         add_custom_target(
           ${_OUTPUT_NAME}
           ALL
           DEPENDS
-            ${OUTPUT_FILE}
+            ${_ABS_OUTPUT_FILE}
         )
     else()
         add_custom_target(
           ${_OUTPUT_NAME}
           DEPENDS
-            ${OUTPUT_FILE}
+            ${_ABS_OUTPUT_FILE}
         )
     endif()
 endfunction()

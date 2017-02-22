@@ -23,7 +23,7 @@ mkdir -p "${bindir}"
 # Move into bindir temporarily
 (
   cd "${bindir}"
-  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" "${srcdir}"
+  cmake -DCMAKE_INSTALL_PREFIX="${installdir}" -DGSETTINGS_LOCALINSTALL=1 -DGSETTINGS_COMPILE=1 "${srcdir}"
   make
   make install
 )
