@@ -8,7 +8,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 tempdir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
-#trap "rm -rf $tempdir" 0 INT QUIT ABRT PIPE TERM
+trap "rm -rf $tempdir" 0 INT QUIT ABRT PIPE TERM
 
 demodir="$(pwd)/examples/gsettings-demo"
 srcdir="${tempdir}/source"
