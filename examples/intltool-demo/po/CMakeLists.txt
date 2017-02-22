@@ -5,7 +5,7 @@ intltool_update_potfile(
     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
     COPYRIGHT_HOLDER "Foocorp Ltd."
     FILE_GLOBS "${CMAKE_SOURCE_DIR}/*.gschema.xml.in" "${CMAKE_SOURCE_DIR}/*.ini.in" "${CMAKE_SOURCE_DIR}/*.cpp" "${CMAKE_SOURCE_DIR}/*.h" "${CMAKE_SOURCE_DIR}/*.c"
-     FILTER ".*test.*"
+    FILTER ".*test.*"
 )
 
 intltool_install_translations(
