@@ -297,18 +297,16 @@ function(INTLTOOL_UPDATE_POTFILE)
           ${_PO_DIRECTORY}
     )
     
-    _GETTEXT_GET_UNIQUE_TARGET_NAME(${_POT_FILE} _UNIQUE_TARGET_NAME)
-
     if(_ARG_ALL)
         add_custom_target(
-          ${_UNIQUE_TARGET_NAME}
+          ${_POT_FILE}
           ALL
           DEPENDS
             "${_PO_DIRECTORY}/${_POT_FILE}"
         )
     else()
         add_custom_target(
-          ${_UNIQUE_TARGET_NAME}
+          ${_POT_FILE}
           DEPENDS
             "${_PO_DIRECTORY}/${_POT_FILE}"
         )
