@@ -1,0 +1,18 @@
+<!DOCTYPE node PUBLIC
+"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd" >
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+  <interface name="org.freedesktop.DBus">
+
+    <method name="GetId">
+      <arg name="id" direction="out" type="s">
+      </arg>
+    </method>
+
+    <method name="ListNames">
+      <arg name="names" direction="out" type="as">
+      </arg>
+    </method>
+
+  </interface>
+</node>
