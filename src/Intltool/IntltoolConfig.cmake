@@ -357,7 +357,7 @@ function(INTLTOOL_INSTALL_TRANSLATIONS)
 endfunction()
 
 function(INTLTOOL_MERGE_TRANSLATIONS FILENAME OUTPUT_FILE)
-    # PASS_THROUGH option in intltool-merge is deprecated, so to is it here.
+    # PASS_THROUGH option in intltool-merge is deprecated, so too is it here.
     # We must keep it around as an option though, to avoid breaking things.
     set(_options ALL UTF8 PASS_THROUGH NO_TRANSLATIONS)
     set(_oneValueArgs PO_DIRECTORY STYLE)
