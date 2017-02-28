@@ -56,3 +56,13 @@ Depends:
   libglib2.0-dev,
   pkg-config,
   uuid-runtime,
+
+Tests: gdbus
+Restrictions: allow-stderr
+Depends:
+  build-essential,
+  cmake,
+  cmake-extras,
+  dbus,
+  libglib2.0-dev,
+  pkg-config,
