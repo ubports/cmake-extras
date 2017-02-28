@@ -1,3 +1,13 @@
+cmake-extras (1.2-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Add function to compile GSettings schemas. (LP: #1664714)
+  * Handle merging translations into non-ini file types. (LP: #1664325)
+  * Append file globs for translation template function. (LP: #1664345)
+  * Use already unique translation template as target name.
+  * Add a GDbus module for using gdbus-codegen in cmake projects.
+
+ -- Rodney Dawes <rodney.dawes@canonical.com>  Mon, 27 Feb 2017 16:09:52 -0500
+
 cmake-extras (1.2+17.04.20170213-0ubuntu1) zesty; urgency=medium
 
   * Add autopkgtest for gsettings macro.
