@@ -299,14 +299,14 @@ function(INTLTOOL_UPDATE_POTFILE)
     
     if(_ARG_ALL)
         add_custom_target(
-          ${_POT_FILE}
+          "${_POT_FILE}"
           ALL
           DEPENDS
             "${_PO_DIRECTORY}/${_POT_FILE}"
         )
     else()
         add_custom_target(
-          ${_POT_FILE}
+          "${_POT_FILE}"
           DEPENDS
             "${_PO_DIRECTORY}/${_POT_FILE}"
         )
