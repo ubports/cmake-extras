@@ -51,7 +51,7 @@ find_package_handle_standard_args(
 #
 #  .. code-block:: cmake
 #
-#   add_gdbus_codegen(DBUX_PROXY
+#   add_gdbus_codegen(DBUS_PROXY
 #     dbus-proxy
 #     org.freedesktop
 #     org.freedesktop.DBus.xml

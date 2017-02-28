@@ -10,12 +10,10 @@ IFS=$'\n\t'
 tempdir=$(mktemp --tmpdir="${AUTOPKGTEST_TMP:-/tmp}" -d)
 trap "rm -rf $tempdir" 0 INT QUIT ABRT PIPE TERM
 
-demodir="$(pwd)/examples/gdbus-demo"
-srcdir="${tempdir}/source"
+srcdir="$(pwd)/examples/gdbus-demo"
 bindir="${tempdir}/build"
 installdir="${tempdir}/install"
 
-cp -r "${demodir}" "${srcdir}"
 mkdir -p "${bindir}"
 
 # Move into bindir temporarily
