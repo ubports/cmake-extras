@@ -29,3 +29,12 @@ msgstr "FooApp is really great translated"
 #: ../src/main.cpp:49
 msgid "Hello FooApp!"
 msgstr "Hello translated FooApp!"
+
+#. The schemas file entries
+#: ../translated.gschema.xml.in.h:1
+msgid "Just a test"
+msgstr "Translated test mate"
+
+#: ../translated.gschema.xml.in.h:2
+msgid "No really, it's just a test."
+msgstr "G'day mate, it's a test!"

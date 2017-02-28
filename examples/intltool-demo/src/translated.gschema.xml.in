@@ -1,0 +1,9 @@
+<schemalist gettext-domain="intltool-demo">
+  <schema id="com.canonical.cmake-extras.translated-test" path="/com/canonical/cmake-extras/translated-test/">
+    <key name="translated" type="b">
+      <default>false</default>
+      <_summary>Just a test</_summary>
+      <_description>No really, it's just a test.</_description>
+    </key>
+  </schema>
+</schemalist>

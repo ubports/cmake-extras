@@ -3,10 +3,12 @@ project(intltool-demo LANGUAGES C CXX)
 
 include(GNUInstallDirs)
 find_package(PkgConfig REQUIRED)
+find_package(Intltool REQUIRED)
 
 pkg_check_modules(
   GLIB REQUIRED
   glib-2.0
+  gio-2.0
 )
 include_directories(${GLIB_INCLUDE_DIRS})
 
