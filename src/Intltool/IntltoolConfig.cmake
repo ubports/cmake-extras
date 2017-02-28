@@ -236,7 +236,7 @@ function(INTLTOOL_UPDATE_POTFILE)
     endif()
  
     if(_ARG_FILE_GLOBS)
-        set(_FILE_GLOBS ${_ARG_FILE_GLOBS})
+        list(APPEND _FILE_GLOBS ${_ARG_FILE_GLOBS})
     endif()
 
     file(
