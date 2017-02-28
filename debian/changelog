@@ -1,12 +1,19 @@
-cmake-extras (1.2-0ubuntu1) UNRELEASED; urgency=medium
+cmake-extras (1.2+17.04.20170228-0ubuntu1) zesty; urgency=medium
 
   * Add function to compile GSettings schemas. (LP: #1664714)
   * Handle merging translations into non-ini file types. (LP: #1664325)
   * Append file globs for translation template function. (LP: #1664345)
   * Use already unique translation template as target name.
   * Add a GDbus module for using gdbus-codegen in cmake projects.
+  * Refactor GSettings module to provide a compile_schemas macro. (LP:
+    #1664714)
+  * Handle other style options for merging, and no translations for xml
+    style. (LP: #1664325)
+  * Append file globs rather than resetting the variable. (LP: #1664345)
+  * Don't use the gettext unique target magic for pot files.
+  * Add a module for using gdbus-codegen code with cmake.
 
- -- Rodney Dawes <rodney.dawes@canonical.com>  Mon, 27 Feb 2017 16:09:52 -0500
+ -- Rodney Dawes <rodney.dawes@canonical.com>  Tue, 28 Feb 2017 17:48:00 +0000
 
 cmake-extras (1.2+17.04.20170213-0ubuntu1) zesty; urgency=medium
 
