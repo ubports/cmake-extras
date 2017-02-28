@@ -22,7 +22,7 @@ static void test_standard()
     g_assert_null(error);
     g_assert_nonnull(proxy.get());
 
-    gchar* result_id;
+    gchar* result_id{nullptr};
     dbus_call_get_id_sync(proxy.get(), &result_id, nullptr, &error);
     g_assert_null(error);
 
@@ -43,7 +43,7 @@ static void test_namespaced()
     g_assert_null(error);
     g_assert_nonnull(proxy.get());
 
-    gchar* result_id;
+    gchar* result_id{nullptr};
     dbus_dbus_call_get_id_sync(proxy.get(), &result_id, nullptr, &error);
     g_assert_null(error);
 
