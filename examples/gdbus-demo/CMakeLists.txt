@@ -19,15 +19,19 @@ pkg_check_modules(
 include_directories(${GLIB_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+set(SOURCES
+  main.cpp
+)
+
 add_gdbus_codegen(
-  DBUS_STANDARD
+  SOURCES
   dbus-standard
   org.freedesktop
   org.freedesktop.DBus.xml
   )
 
 add_gdbus_codegen(
-  DBUS_NAMESPACED
+  SOURCES
   dbus-namespaced
   org.freedesktop
   org.freedesktop.DBus.xml
@@ -37,9 +41,7 @@ add_gdbus_codegen(
 add_executable(
   test-gdbus
 
-  main.cpp
-  ${DBUS_STANDARD_SOURCES}
-  ${DBUS_NAMESPACED_SOURCES}
+  ${SOURCES}
   )
 target_link_libraries(
   test-gdbus
