@@ -137,12 +137,10 @@ function(_INTLTOOL_JOIN_LIST LISTNAME GLUE OUTPUT)
 endfunction()
 
 macro(_WRITE_INTLTOOL_MAKEFILE_IN ARG_PO_DIRECTORY ARG_KEYWORDS
-                                  ARG_COPYRIGHT_HOLDER ARG_LANGUAGES)
+                                  ARG_COPYRIGHT_HOLDER ARG_LANGUAGE)
     set(_KEYWORDS "XGETTEXT_KEYWORDS=")
-    if(NOT "${ARG_LANGUAGES}" STREQUAL "")
-        foreach(_LANG ${ARG_LANGUAGES})
-            set(_KEYWORDS "${_KEYWORDS}--language ${_LANG} ")
-        endforeach()
+    if(NOT "${ARG_LANGUAGE}" STREQUAL "")
+        set(_KEYWORDS "${_KEYWORDS}--language ${ARG_LANGUAGE} ")
     else()
         set(_KEYWORDS "${_KEYWORDS}--c++")
     endif()
@@ -199,8 +197,8 @@ endfunction()
 
 function(INTLTOOL_UPDATE_POTFILE)
     set(_options ALL UBUNTU_SDK_DEFAULTS)
-    set(_oneValueArgs COPYRIGHT_HOLDER GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE)
-    set(_multiValueArgs KEYWORDS FILE_GLOBS FILTER LANGUAGES)
+    set(_oneValueArgs COPYRIGHT_HOLDER GETTEXT_PACKAGE OUTPUT_FILE PO_DIRECTORY POTFILES_TEMPLATE LANGUAGE)
+    set(_multiValueArgs KEYWORDS FILE_GLOBS FILTER)
 
     cmake_parse_arguments(_ARG "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
     
@@ -224,10 +222,10 @@ function(INTLTOOL_UPDATE_POTFILE)
     endif()
 
     if(_ARG_KEYWORDS)
-        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS "${_ARG_COPYRIGHT_HOLDER}" "${_ARG_LANGUAGES}")
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _ARG_KEYWORDS "${_ARG_COPYRIGHT_HOLDER}" "${_ARG_LANGUAGE}")
     elseif(_ARG_UBUNTU_SDK_DEFAULTS)
         set(_UBUNTU_SDK_DEFAULT_KEYWORDS "tr" "tr:1,2" "dtr:2" "dtr:2,3" "N_")
-        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS "${_ARG_COPYRIGHT_HOLDER}" "${_ARG_LANGUAGES}")
+        _write_intltool_makefile_in(${_PO_DIRECTORY} _UBUNTU_SDK_DEFAULT_KEYWORDS "${_ARG_COPYRIGHT_HOLDER}" "${_ARG_LANGUAGE}")
     endif()
     
     set(_FILE_GLOBS

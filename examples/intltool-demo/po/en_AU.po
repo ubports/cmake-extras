@@ -38,3 +38,11 @@ msgstr "Translated test mate"
 #: ../translated.gschema.xml.in.h:2
 msgid "No really, it's just a test."
 msgstr "G'day mate, it's a test!"
+
+#: ../python/other_language_translations.py:7
+msgid "Python apps can be translated, too"
+msgstr "Crikey, watch the snake!"
+
+#: ../python/other_language_translations.py:8
+msgid "Regardless of single- or double-quotes"
+msgstr "This, that, or the other"
