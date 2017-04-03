@@ -15,7 +15,6 @@ Package: cmake-extras
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends},
-         cmake (>= ${cmake:Version}),
-         cmake (<< ${cmake:nextMajor}),
+         cmake (>= 3.1),
 Description: Extra CMake utility modules.
  Modules for coverage testing, building gtest, doxygen documentation, and more.
