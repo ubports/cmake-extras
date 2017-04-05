@@ -10,11 +10,3 @@ install(
   USE_SOURCE_PERMISSIONS
 )
 
-# Modules installed directly to CMAKE_ROOT
-# TODO: migrate these to the above tree, since installing to
-#       CMAKE_ROOT is frowned upon.
-install(
-  DIRECTORY "modules/"
-  DESTINATION "${CMAKE_ROOT}/Modules/"
-  USE_SOURCE_PERMISSIONS
-)
