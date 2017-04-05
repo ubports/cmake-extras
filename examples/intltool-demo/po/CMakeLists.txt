@@ -4,8 +4,9 @@ intltool_update_potfile(
     POTFILES_TEMPLATE "POTFILES.in.in"
     GETTEXT_PACKAGE ${GETTEXT_PACKAGE}
     COPYRIGHT_HOLDER "Foocorp Ltd."
-    FILE_GLOBS "${CMAKE_SOURCE_DIR}/*.gschema.xml.in"
+    FILE_GLOBS "${CMAKE_SOURCE_DIR}/*.gschema.xml.in;${CMAKE_SOURCE_DIR}/python/*.py"
     FILTER ".*test.*"
+    LANGUAGE "python"
 )
 
 intltool_install_translations(
