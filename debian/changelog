@@ -1,3 +1,9 @@
+cmake-extras (0.11+ubports) vivid; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Thu, 17 Aug 2017 14:51:22 +0200
+
 cmake-extras (0.10+17.04.20161208.1-0ubuntu1) zesty; urgency=medium
 
   [ Pete ]
