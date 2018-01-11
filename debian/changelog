@@ -1,3 +1,9 @@
+cmake-extras (1.4.2+ubports) xenial; urgency=medium
+
+  * Update Jenkinsfile and release to xenial
+
+ -- Dan Chapman <dan@ubports.com>  Thu, 11 Jan 2018 12:50:31 +0000
+
 cmake-extras (0.11+ubports) vivid; urgency=medium
 
   * Imported to UBports
