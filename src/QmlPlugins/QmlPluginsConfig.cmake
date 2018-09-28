@@ -5,7 +5,7 @@ if(NOT TARGET qmlplugindump)
     find_program(qmlplugindump_exe qmlplugindump)
 
     if(NOT qmlplugindump_exe)
-      msg(FATAL_ERROR "Could not locate qmlplugindump.")
+      message(FATAL_ERROR "Could not locate qmlplugindump.")
     endif()
 
     add_executable(qmlplugindump IMPORTED)
