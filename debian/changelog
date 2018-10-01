@@ -1,3 +1,9 @@
+cmake-extras (1.5) UNRELEASED; urgency=medium
+
+  * Bump version.
+
+ -- Rodney Dawes <dobey.pwns@gmail.com>  Mon, 01 Oct 2018 17:18:30 -0400
+
 cmake-extras (1.4+17.04.20170405-0ubuntu1) zesty; urgency=medium
 
   [ Pete Woods ]
