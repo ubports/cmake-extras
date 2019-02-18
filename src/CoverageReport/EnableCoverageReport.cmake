@@ -187,10 +187,11 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
                               DEPENDS ${GLOBAL_DEPENDS})
         ENDIF()
                           
-    ENDIF()
+        # This gets rid of any stale .gcda files. Run this if running a binary
+        # causes lots of messages about about a "merge mismatch for summaries."
+        ADD_CUSTOM_TARGET(clean-coverage
+          COMMAND find ${CMAKE_BINARY_DIR} -name '*.gcda' | xargs rm -f)
 
-    # This gets rid of any stale .gcda files. Run this if a running a binary causes lots of
-    # messages about about a "merge mismatch for summaries".
-    ADD_CUSTOM_TARGET(clean-coverage COMMAND find ${CMAKE_BINARY_DIR} -name '*.gcda' | xargs rm -f)
+    ENDIF()
 
 ENDFUNCTION()
