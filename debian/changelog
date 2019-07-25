@@ -1,4 +1,4 @@
-cmake-extras (1.5) UNRELEASED; urgency=medium
+cmake-extras (1.5) bionic; urgency=medium
 
   * Bump version.
 
