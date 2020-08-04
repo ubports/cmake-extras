@@ -2,6 +2,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 #include <libintl.h>
+#include <locale.h>
 
 using namespace std;
 
